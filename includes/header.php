@@ -254,6 +254,13 @@ $current_uri = $_SERVER['REQUEST_URI'] ?? '/';
 </head>
 <body class="bg-[#f8fafc] text-slate-800 flex flex-col min-h-screen antialiased">
 
+<?php if (!empty($db_is_mock)): ?>
+<div class="bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 text-slate-900 text-xs py-2 px-4 text-center font-bold flex items-center justify-center gap-2 shadow-xs z-[1000] relative">
+    <svg class="w-4 h-4 shrink-0 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    <span><strong>Localhost Preview Mode:</strong> MySQL is currently offline or not imported yet. The site is running with sample 4MEN Collection data. Once you start MySQL in XAMPP, it will automatically connect to your database.</span>
+</div>
+<?php endif; ?>
+
     <!-- ==================== 1. UNIVERSAL CATEGORIES & SUB-CATEGORIES SIDEBAR ==================== -->
     <div id="drawer-overlay" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-[998] opacity-0 pointer-events-none transition-opacity duration-300 ease-in-out"></div>
 
