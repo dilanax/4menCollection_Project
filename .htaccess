@@ -1,0 +1,18 @@
+RewriteEngine On
+RewriteBase /
+
+# 1. Product Single Page (/product/atomic-habits -> index.php?page=product&slug=atomic-habits)
+RewriteRule ^product/([^/]+)/?$ index.php?page=product&slug=$1 [QSA,L]
+
+# 2. Category URL (/category/novels -> index.php?page=shop&category=$1&categories[]=$1)
+RewriteRule ^category/([^/]+)/?$ index.php?page=shop&category=$1&categories[]=$1 [QSA,L]
+
+# 3. Publisher / Brand URL (/publisher/sarasavi -> index.php?page=shop&brand=$1&brands[]=$1)
+RewriteRule ^publisher/([^/]+)/?$ index.php?page=shop&brand=$1&brands[]=$1 [QSA,L]
+
+# Existing files and folders skip
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# All other pages to index.php
+RewriteRule ^(.*)$ index.php?page=$1 [QSA,L]

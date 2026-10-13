@@ -1,0 +1,64 @@
+[09-Sep-2026 07:30:17 UTC] PHP Warning:  require_once(config/db.php): Failed to open stream: No such file or directory in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php on line 3
+[09-Sep-2026 07:30:17 UTC] PHP Fatal error:  Uncaught Error: Failed opening required 'config/db.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php:3
+Stack trace:
+#0 {main}
+  thrown in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php on line 3
+[09-Sep-2026 11:00:11 UTC] PHP Warning:  require_once(config/db.php): Failed to open stream: No such file or directory in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php on line 3
+[09-Sep-2026 11:00:11 UTC] PHP Fatal error:  Uncaught Error: Failed opening required 'config/db.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php:3
+Stack trace:
+#0 {main}
+  thrown in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php on line 3
+[09-Sep-2026 11:03:38 UTC] PHP Warning:  require_once(config/db.php): Failed to open stream: No such file or directory in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php on line 3
+[09-Sep-2026 11:03:38 UTC] PHP Fatal error:  Uncaught Error: Failed opening required 'config/db.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php:3
+Stack trace:
+#0 {main}
+  thrown in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php on line 3
+[09-Sep-2026 11:30:50 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function mail() in /home/loopzglo/readershub.loopzglobal.com/config/email_helper.php:88
+Stack trace:
+#0 /home/loopzglo/readershub.loopzglobal.com/config/email_helper.php(66): sendHtmlEmail()
+#1 /home/loopzglo/readershub.loopzglobal.com/pages/checkout/checkout_action.php(317): sendAccountEmail()
+#2 {main}
+  thrown in /home/loopzglo/readershub.loopzglobal.com/config/email_helper.php on line 88
+[09-Sep-2026 11:31:46 UTC] PHP Parse error:  Unmatched '}' in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php on line 17
+[11-Sep-2026 03:01:59 UTC] PHP Parse error:  Unmatched '}' in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php on line 17
+[11-Sep-2026 03:04:57 UTC] PHP Parse error:  Unmatched '}' in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php on line 17
+[11-Sep-2026 03:05:26 UTC] PHP Parse error:  Unmatched '}' in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php on line 17
+[11-Sep-2026 07:41:16 UTC] PHP Warning:  Undefined variable $merchant_id in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php on line 58
+[11-Sep-2026 07:42:01 UTC] PHP Warning:  Undefined variable $merchant_id in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php on line 58
+[11-Sep-2026 07:45:32 UTC] PHP Warning:  Undefined variable $merchant_id in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php on line 58
+[11-Sep-2026 08:45:50 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function mail() in /home/loopzglo/readershub.loopzglobal.com/config/email_helper.php:88
+Stack trace:
+#0 /home/loopzglo/readershub.loopzglobal.com/config/email_helper.php(66): sendHtmlEmail()
+#1 /home/loopzglo/readershub.loopzglobal.com/pages/checkout/checkout_action.php(417): sendAccountEmail()
+#2 {main}
+  thrown in /home/loopzglo/readershub.loopzglobal.com/config/email_helper.php on line 88
+[11-Sep-2026 08:46:06 UTC] PHP Warning:  Undefined array key "cart" in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/checkout_action.php on line 253
+[11-Sep-2026 08:46:06 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/checkout_action.php on line 253
+[11-Sep-2026 08:50:17 UTC] PHP Warning:  require_once(config/db.php): Failed to open stream: No such file or directory in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php on line 3
+[11-Sep-2026 08:50:17 UTC] PHP Fatal error:  Uncaught Error: Failed opening required 'config/db.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php:3
+Stack trace:
+#0 {main}
+  thrown in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php on line 3
+[11-Sep-2026 08:51:24 UTC] PHP Warning:  require_once(config/db.php): Failed to open stream: No such file or directory in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php on line 3
+[11-Sep-2026 08:51:24 UTC] PHP Fatal error:  Uncaught Error: Failed opening required 'config/db.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php:3
+Stack trace:
+#0 {main}
+  thrown in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php on line 3
+[11-Sep-2026 08:51:39 UTC] PHP Warning:  require_once(config/db.php): Failed to open stream: No such file or directory in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php on line 3
+[11-Sep-2026 08:51:39 UTC] PHP Fatal error:  Uncaught Error: Failed opening required 'config/db.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php:3
+Stack trace:
+#0 {main}
+  thrown in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php on line 3
+[11-Sep-2026 08:53:32 UTC] PHP Warning:  require_once(config/db.php): Failed to open stream: No such file or directory in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php on line 3
+[11-Sep-2026 08:53:32 UTC] PHP Fatal error:  Uncaught Error: Failed opening required 'config/db.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php:3
+Stack trace:
+#0 {main}
+  thrown in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/payhere_redirect.php on line 3
+[11-Sep-2026 08:58:56 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function mail() in /home/loopzglo/readershub.loopzglobal.com/config/email_helper.php:88
+Stack trace:
+#0 /home/loopzglo/readershub.loopzglobal.com/config/email_helper.php(66): sendHtmlEmail()
+#1 /home/loopzglo/readershub.loopzglobal.com/pages/checkout/checkout_action.php(417): sendAccountEmail()
+#2 {main}
+  thrown in /home/loopzglo/readershub.loopzglobal.com/config/email_helper.php on line 88
+[11-Sep-2026 08:59:11 UTC] PHP Warning:  Undefined array key "cart" in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/checkout_action.php on line 253
+[11-Sep-2026 08:59:11 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in /home/loopzglo/readershub.loopzglobal.com/pages/checkout/checkout_action.php on line 253

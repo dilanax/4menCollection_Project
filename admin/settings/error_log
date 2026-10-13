@@ -1,0 +1,36 @@
+[13-Apr-2026 23:20:08 UTC] PHP Deprecated:  json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in /home/templatesloopzgl/ecommerce.loopzglobal.com/admin/settings/shipping_classes.php on line 292
+[13-Apr-2026 23:20:39 UTC] PHP Deprecated:  json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in /home/templatesloopzgl/ecommerce.loopzglobal.com/admin/settings/shipping_classes.php on line 292
+[13-Apr-2026 23:20:42 UTC] PHP Deprecated:  json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in /home/templatesloopzgl/ecommerce.loopzglobal.com/admin/settings/shipping_classes.php on line 292
+[14-Apr-2026 01:51:34 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`templatesloopzgl_ECoMtemplatesDb`.`orders`, CONSTRAINT `orders_ibfk_3` FOREIGN KEY (`shipping_method_id`) REFERENCES `shipping_methods` (`id`)) in /home/templatesloopzgl/ecommerce.loopzglobal.com/admin/settings/shipping_methods.php:78
+Stack trace:
+#0 /home/templatesloopzgl/ecommerce.loopzglobal.com/admin/settings/shipping_methods.php(78): PDOStatement->execute(Array)
+#1 {main}
+  thrown in /home/templatesloopzgl/ecommerce.loopzglobal.com/admin/settings/shipping_methods.php on line 78
+[14-Apr-2026 01:51:38 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`templatesloopzgl_ECoMtemplatesDb`.`orders`, CONSTRAINT `orders_ibfk_3` FOREIGN KEY (`shipping_method_id`) REFERENCES `shipping_methods` (`id`)) in /home/templatesloopzgl/ecommerce.loopzglobal.com/admin/settings/shipping_methods.php:78
+Stack trace:
+#0 /home/templatesloopzgl/ecommerce.loopzglobal.com/admin/settings/shipping_methods.php(78): PDOStatement->execute(Array)
+#1 {main}
+  thrown in /home/templatesloopzgl/ecommerce.loopzglobal.com/admin/settings/shipping_methods.php on line 78
+[14-Apr-2026 01:51:43 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`templatesloopzgl_ECoMtemplatesDb`.`orders`, CONSTRAINT `orders_ibfk_3` FOREIGN KEY (`shipping_method_id`) REFERENCES `shipping_methods` (`id`)) in /home/templatesloopzgl/ecommerce.loopzglobal.com/admin/settings/shipping_methods.php:78
+Stack trace:
+#0 /home/templatesloopzgl/ecommerce.loopzglobal.com/admin/settings/shipping_methods.php(78): PDOStatement->execute(Array)
+#1 {main}
+  thrown in /home/templatesloopzgl/ecommerce.loopzglobal.com/admin/settings/shipping_methods.php on line 78
+[14-Apr-2026 01:51:51 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`templatesloopzgl_ECoMtemplatesDb`.`orders`, CONSTRAINT `orders_ibfk_3` FOREIGN KEY (`shipping_method_id`) REFERENCES `shipping_methods` (`id`)) in /home/templatesloopzgl/ecommerce.loopzglobal.com/admin/settings/shipping_methods.php:78
+Stack trace:
+#0 /home/templatesloopzgl/ecommerce.loopzglobal.com/admin/settings/shipping_methods.php(78): PDOStatement->execute(Array)
+#1 {main}
+  thrown in /home/templatesloopzgl/ecommerce.loopzglobal.com/admin/settings/shipping_methods.php on line 78
+[14-Apr-2026 01:52:03 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`templatesloopzgl_ECoMtemplatesDb`.`orders`, CONSTRAINT `orders_ibfk_3` FOREIGN KEY (`shipping_method_id`) REFERENCES `shipping_methods` (`id`)) in /home/templatesloopzgl/ecommerce.loopzglobal.com/admin/settings/shipping_methods.php:78
+Stack trace:
+#0 /home/templatesloopzgl/ecommerce.loopzglobal.com/admin/settings/shipping_methods.php(78): PDOStatement->execute(Array)
+#1 {main}
+  thrown in /home/templatesloopzgl/ecommerce.loopzglobal.com/admin/settings/shipping_methods.php on line 78
+[14-Apr-2026 01:56:53 UTC] PHP Deprecated:  json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in /home/templatesloopzgl/ecommerce.loopzglobal.com/admin/settings/shipping_classes.php on line 292
+[14-Apr-2026 01:56:59 UTC] PHP Deprecated:  json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in /home/templatesloopzgl/ecommerce.loopzglobal.com/admin/settings/shipping_classes.php on line 292
+[15-Apr-2026 04:14:34 UTC] PHP Deprecated:  json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in /home/templatesloopzgl/ecommerce.loopzglobal.com/admin/settings/shipping_classes.php on line 292
+[16-Apr-2026 03:35:22 UTC] PHP Deprecated:  json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in /home/templatesloopzgl/ecommerce.loopzglobal.com/admin/settings/shipping_classes.php on line 292
+[16-Apr-2026 04:26:49 UTC] PHP Deprecated:  json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in /home/templatesloopzgl/ecommerce.loopzglobal.com/admin/settings/shipping_classes.php on line 202
+[16-Apr-2026 04:26:49 UTC] PHP Deprecated:  json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in /home/templatesloopzgl/ecommerce.loopzglobal.com/admin/settings/shipping_classes.php on line 251
+[16-Apr-2026 04:29:09 UTC] PHP Deprecated:  json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in /home/templatesloopzgl/ecommerce.loopzglobal.com/admin/settings/shipping_classes.php on line 202
+[16-Apr-2026 04:29:09 UTC] PHP Deprecated:  json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in /home/templatesloopzgl/ecommerce.loopzglobal.com/admin/settings/shipping_classes.php on line 251
