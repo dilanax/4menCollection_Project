@@ -152,9 +152,9 @@ if (!($pdo instanceof PDO)) {
             ];
 
             $this->mock_brands = [
-                ['id' => 1, 'name' => '4MEN Tailored', 'slug' => '4men-tailored', 'logo' => ''],
-                ['id' => 2, 'name' => '4MEN Casuals', 'slug' => '4men-casuals', 'logo' => ''],
-                ['id' => 3, 'name' => '4MEN Essentials', 'slug' => '4men-essentials', 'logo' => ''],
+                ['id' => 1, 'name' => '4MEN Tailored', 'slug' => '4men-tailored', 'logo' => '', 'image' => '', 'product_count' => 8],
+                ['id' => 2, 'name' => '4MEN Casuals', 'slug' => '4men-casuals', 'logo' => '', 'image' => '', 'product_count' => 6],
+                ['id' => 3, 'name' => '4MEN Essentials', 'slug' => '4men-essentials', 'logo' => '', 'image' => '', 'product_count' => 10],
             ];
 
             $this->mock_settings = [

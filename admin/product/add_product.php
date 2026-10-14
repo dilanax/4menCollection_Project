@@ -71,7 +71,7 @@ function renderCategories($tree, $level = 0) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add New Product | ReadersHub Admin</title>
+    <title>Add New Product | 4MEN COLLECTION Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -79,9 +79,9 @@ function renderCategories($tree, $level = 0) {
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        body, input, textarea, select, button { font-family: 'Poppins', sans-serif !important; }
+        body, input, textarea, select, button { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; }
         
         /* Modern Scrollbars */
         ::-webkit-scrollbar { width: 5px; height: 5px; }
@@ -92,15 +92,15 @@ function renderCategories($tree, $level = 0) {
         /* Select2 Theme Tweaks */
         .select2-container--default .select2-selection--multiple { 
             background-color: #f8fafc; 
-            border: 1px solid #cbd5e1; 
+            border: 1px solid #e2e8f0; 
             border-radius: 0.75rem; 
             padding: 4px;
             font-size: 0.8125rem;
         }
         .select2-container--default .select2-selection--multiple .select2-selection__choice { 
-            background-color: #e0f2fe; 
-            border: 1px solid #bae6fd; 
-            color: #0369a1; 
+            background-color: #f1f5f9; 
+            border: 1px solid #e2e8f0; 
+            color: #0f172a; 
             border-radius: 6px; 
             font-weight: 600; 
             font-size: 12px;
@@ -111,9 +111,9 @@ function renderCategories($tree, $level = 0) {
             margin-right: 4px; 
             font-weight: bold;
         }
-        .select2-dropdown { border: 1px solid #cbd5e1; border-radius: 0.75rem; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .select2-dropdown { border: 1px solid #e2e8f0; border-radius: 0.75rem; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
         .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable { 
-            background-color: #0369a1; 
+            background-color: #000000; 
             color: white;
         }
     </style>
@@ -135,7 +135,7 @@ function renderCategories($tree, $level = 0) {
                 </button>
                 <div>
                     <span class="text-[10px] font-extrabold uppercase tracking-widest text-sky-700 block">Inventory Management</span>
-                    <h1 class="text-base sm:text-lg lg:text-xl font-black text-slate-900 tracking-tight truncate">Add New Book / Product</h1>
+                    <h1 class="text-base sm:text-lg lg:text-xl font-black text-slate-900 tracking-tight truncate">Add New Product</h1>
                 </div>
             </div>
             
@@ -154,8 +154,8 @@ function renderCategories($tree, $level = 0) {
                     
                     <!-- Title & Slug -->
                     <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/90 shadow-xs">
-                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Book Title *</label>
-                        <input type="text" name="name" id="product_title" required placeholder="e.g. Madol Doova" class="w-full bg-slate-50 border border-slate-200 focus:bg-white text-lg sm:text-xl font-extrabold text-slate-900 placeholder-slate-400 rounded-xl px-4 py-2.5 focus:border-sky-700 outline-none transition-colors mb-2.5">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Product Title *</label>
+                        <input type="text" name="name" id="product_title" required placeholder="e.g. Classic Oxford Cotton Shirt" class="w-full bg-slate-50 border border-slate-200 focus:bg-white text-lg sm:text-xl font-extrabold text-slate-900 placeholder-slate-400 rounded-xl px-4 py-2.5 focus:border-sky-700 outline-none transition-colors mb-2.5">
                         
                         <div class="flex flex-col sm:flex-row sm:items-center text-xs text-slate-500 font-medium gap-1 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
                             <span class="shrink-0 font-bold text-slate-600">Permalink:</span>
@@ -166,8 +166,8 @@ function renderCategories($tree, $level = 0) {
 
                     <!-- Description -->
                     <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/90 shadow-xs">
-                        <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider mb-3">Book Overview & Full Description</h3>
-                        <textarea name="description" rows="7" placeholder="Detailed book description, author background, synopsis..." class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs sm:text-sm rounded-xl px-4 py-3 focus:bg-white focus:border-sky-700 outline-none transition-colors"></textarea>
+                        <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider mb-3">Product Overview & Full Description</h3>
+                        <textarea name="description" rows="7" placeholder="Detailed product description, fabric & material composition, fit & sizing guide, care instructions..." class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs sm:text-sm rounded-xl px-4 py-3 focus:bg-white focus:border-neutral-900 outline-none transition-colors"></textarea>
                     </div>
 
                     <!-- Product Data Tabs Card -->
@@ -176,19 +176,19 @@ function renderCategories($tree, $level = 0) {
                         <!-- Top Tab Bar Header -->
                         <div class="bg-slate-50 border-b border-slate-200 p-4 sm:p-5 flex flex-col sm:flex-row gap-3 sm:items-center justify-between">
                             <div class="flex items-center gap-2">
-                                <span class="w-2.5 h-2.5 rounded-full bg-sky-700"></span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-neutral-900"></span>
                                 <h3 class="text-sm font-black text-slate-900 tracking-tight">Product Specifications</h3>
                             </div>
                             
                             <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
                                 <label class="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer select-none">
-                                    <input type="checkbox" name="is_downloadable" id="is_downloadable" value="1" class="rounded border-slate-300 text-sky-700 focus:ring-sky-600 w-4 h-4"> 
-                                    <span>E-Book / Downloadable</span>
+                                    <input type="checkbox" name="is_downloadable" id="is_downloadable" value="1" class="rounded border-slate-300 text-neutral-900 focus:ring-black w-4 h-4"> 
+                                    <span>Digital Voucher / Downloadable</span>
                                 </label>
                                 
-                                <select name="product_type" id="product_type" class="bg-white border border-slate-300 text-xs font-bold text-slate-800 rounded-xl px-3 py-2 outline-none focus:border-sky-700 shadow-xs cursor-pointer">
-                                    <option value="simple">Simple Product (Physical Book)</option>
-                                    <option value="variable">Variable Product (Editions / Covers)</option>
+                                <select name="product_type" id="product_type" class="bg-white border border-slate-300 text-xs font-bold text-slate-800 rounded-xl px-3 py-2 outline-none focus:border-neutral-900 shadow-xs cursor-pointer">
+                                    <option value="simple">Simple Product (Single Apparel Item)</option>
+                                    <option value="variable">Variable Product (Sizes / Colors / Fits)</option>
                                 </select>
                             </div>
                         </div>
@@ -198,13 +198,13 @@ function renderCategories($tree, $level = 0) {
                             
                             <!-- Tab Navigation Buttons -->
                             <div class="w-full md:w-48 bg-slate-50/70 border-b md:border-b-0 md:border-r border-slate-200 flex flex-row md:flex-col overflow-x-auto md:overflow-x-visible shrink-0 p-2 md:p-2.5 gap-1">
-                                <button type="button" class="tab-btn active text-sky-700 bg-white shadow-xs font-black whitespace-nowrap text-left px-4 py-2.5 text-xs rounded-xl transition" data-target="tab-general">General Pricing</button>
+                                <button type="button" class="tab-btn active text-white bg-neutral-900 shadow-xs font-bold whitespace-nowrap text-left px-4 py-2.5 text-xs rounded-xl transition" data-target="tab-general">General Pricing</button>
                                 <button type="button" class="tab-btn text-slate-600 hover:text-slate-900 font-semibold whitespace-nowrap text-left px-4 py-2.5 text-xs rounded-xl transition" data-target="tab-inventory">Inventory / SKU</button>
                                 <button type="button" class="tab-btn text-slate-600 hover:text-slate-900 font-semibold whitespace-nowrap text-left px-4 py-2.5 text-xs rounded-xl transition" data-target="tab-shipping">Shipping & Parcel</button>
-                                <button type="button" class="tab-btn text-slate-600 hover:text-slate-900 font-semibold whitespace-nowrap text-left px-4 py-2.5 text-xs rounded-xl transition" data-target="tab-linked">Linked Titles</button>
-                                <button type="button" class="tab-btn text-slate-600 hover:text-slate-900 font-semibold whitespace-nowrap text-left px-4 py-2.5 text-xs rounded-xl transition" data-target="tab-attributes">Attributes (Author/Format)</button>
+                                <button type="button" class="tab-btn text-slate-600 hover:text-slate-900 font-semibold whitespace-nowrap text-left px-4 py-2.5 text-xs rounded-xl transition" data-target="tab-linked">Linked Products</button>
+                                <button type="button" class="tab-btn text-slate-600 hover:text-slate-900 font-semibold whitespace-nowrap text-left px-4 py-2.5 text-xs rounded-xl transition" data-target="tab-attributes">Attributes (Size/Color/Fabric)</button>
                                 <button type="button" class="tab-btn hidden text-slate-600 hover:text-slate-900 font-semibold whitespace-nowrap text-left px-4 py-2.5 text-xs rounded-xl transition" data-target="tab-variations" id="nav-variations">Variations</button>
-                                <button type="button" class="tab-btn hidden text-slate-600 hover:text-slate-900 font-semibold whitespace-nowrap text-left px-4 py-2.5 text-xs rounded-xl transition" data-target="tab-download" id="nav-download">Digital E-Book</button>
+                                <button type="button" class="tab-btn hidden text-slate-600 hover:text-slate-900 font-semibold whitespace-nowrap text-left px-4 py-2.5 text-xs rounded-xl transition" data-target="tab-download" id="nav-download">Digital Attachment</button>
                             </div>
 
                             <!-- Inner Panels -->
@@ -248,8 +248,8 @@ function renderCategories($tree, $level = 0) {
                                 <!-- 2. Inventory -->
                                 <div id="tab-inventory" class="tab-content hidden space-y-4">
                                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 items-center">
-                                        <label class="text-xs font-bold text-slate-700 sm:text-right">ISBN / SKU</label>
-                                        <input type="text" name="sku" placeholder="ISBN number" class="sm:col-span-2 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-3.5 py-2 text-xs sm:text-sm focus:bg-white focus:border-sky-700 outline-none w-full sm:w-2/3 font-mono">
+                                        <label class="text-xs font-bold text-slate-700 sm:text-right">SKU / Product Code</label>
+                                        <input type="text" name="sku" placeholder="e.g. 4M-SHIRT-001" class="sm:col-span-2 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-3.5 py-2 text-xs sm:text-sm focus:bg-white focus:border-sky-700 outline-none w-full sm:w-2/3 font-mono">
                                     </div>
 
                                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 items-center">
@@ -321,7 +321,7 @@ function renderCategories($tree, $level = 0) {
                                 <!-- 4. Linked Products -->
                                 <div id="tab-linked" class="tab-content hidden space-y-4">
                                     <div>
-                                        <label class="text-xs font-bold text-slate-700 block mb-1.5">Upsells <span class="text-slate-400 font-normal">(Books recommended on Product Details page)</span></label>
+                                        <label class="text-xs font-bold text-slate-700 block mb-1.5">Upsells <span class="text-slate-400 font-normal">(Products recommended on Product Details page)</span></label>
                                         <select name="upsell_ids[]" class="select2-multiple w-full" multiple="multiple">
                                             <?php foreach ($all_products as $p): ?>
                                                 <option value="<?php echo $p['id']; ?>"><?php echo htmlspecialchars($p['name']); ?></option>
@@ -329,7 +329,7 @@ function renderCategories($tree, $level = 0) {
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="text-xs font-bold text-slate-700 block mb-1.5">Cross-sells <span class="text-slate-400 font-normal">(Books recommended inside Shopping Cart)</span></label>
+                                        <label class="text-xs font-bold text-slate-700 block mb-1.5">Cross-sells <span class="text-slate-400 font-normal">(Products recommended inside Shopping Cart)</span></label>
                                         <select name="crosssell_ids[]" class="select2-multiple w-full" multiple="multiple">
                                             <?php foreach ($all_products as $p): ?>
                                                 <option value="<?php echo $p['id']; ?>"><?php echo htmlspecialchars($p['name']); ?></option>
@@ -338,11 +338,11 @@ function renderCategories($tree, $level = 0) {
                                     </div>
                                 </div>
 
-                                <!-- 5. Attributes (Author, Color, Format etc.) -->
+                                <!-- 5. Attributes (Size, Color, Fabric etc.) -->
                                 <div id="tab-attributes" class="tab-content hidden space-y-4">
-                                    <div class="bg-sky-50 border border-sky-100 p-3.5 rounded-2xl">
-                                        <p class="text-xs font-bold text-sky-900">Configure Book Attributes</p>
-                                        <p class="text-[11px] text-sky-700 mt-0.5">Select author(s) or custom terms below. Checked attributes will be displayed on the product page and used in shop filters.</p>
+                                    <div class="bg-neutral-50 border border-neutral-200 p-3.5 rounded-2xl">
+                                        <p class="text-xs font-bold text-neutral-900">Configure Clothing Attributes</p>
+                                        <p class="text-[11px] text-neutral-600 mt-0.5">Select size(s), color(s), material(s) or custom terms below. Checked attributes will be displayed on the product page and used in shop filters.</p>
                                     </div>
 
                                     <?php foreach ($attributes as $attr): ?>
@@ -383,7 +383,7 @@ function renderCategories($tree, $level = 0) {
                                     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 pb-4 border-b border-slate-200">
                                         <div>
                                             <h4 class="text-xs font-black text-slate-900 uppercase">Product Variations</h4>
-                                            <p class="text-[11px] text-slate-500">Generate inputs based on selected attributes for variable books.</p>
+                                            <p class="text-[11px] text-slate-500">Generate inputs based on selected attributes for variable clothing items.</p>
                                         </div>
                                         <button type="button" id="btn-generate-variations" class="bg-sky-50 text-sky-800 border border-sky-200 hover:bg-sky-700 hover:text-white font-bold text-xs px-4 py-2 rounded-xl transition shadow-xs">
                                             Generate Variations
@@ -398,12 +398,12 @@ function renderCategories($tree, $level = 0) {
                                 <!-- 7. Downloadable -->
                                 <div id="tab-download" class="tab-content hidden space-y-4">
                                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 items-center">
-                                        <label class="text-xs font-bold text-slate-700 sm:text-right">E-Book File</label>
+                                        <label class="text-xs font-bold text-slate-700 sm:text-right">Attachment / Voucher File</label>
                                         <input type="file" name="download_file" accept=".pdf,.epub,.zip" class="sm:col-span-2 text-xs text-slate-600 bg-slate-50 border border-slate-200 rounded-xl w-full sm:w-2/3 p-1 cursor-pointer">
                                     </div>
                                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 items-center">
                                         <label class="text-xs font-bold text-slate-700 sm:text-right">Download Limit</label>
-                                        <input type="number" name="download_limit" placeholder="Leave blank for unlimited" class="sm:col-span-2 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-3.5 py-2 text-xs sm:text-sm focus:bg-white focus:border-sky-700 outline-none w-full sm:w-1/3">
+                                        <input type="number" name="download_limit" placeholder="Leave blank for unlimited" class="sm:col-span-2 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-3.5 py-2 text-xs sm:text-sm focus:bg-white focus:border-neutral-900 outline-none w-full sm:w-1/3">
                                     </div>
                                 </div>
 
@@ -413,20 +413,20 @@ function renderCategories($tree, $level = 0) {
 
                     <!-- Short Description -->
                     <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/90 shadow-xs">
-                        <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider mb-3">Short Synopsis</h3>
-                        <textarea name="short_description" rows="3" placeholder="Brief summary for book card display..." class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs sm:text-sm rounded-xl px-4 py-3 focus:bg-white focus:border-sky-700 outline-none transition-colors"></textarea>
+                        <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider mb-3">Short Description / Highlights</h3>
+                        <textarea name="short_description" rows="3" placeholder="Brief summary for product card display (e.g. Premium 100% breathable cotton, slim-fit silhouette, easy iron)..." class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs sm:text-sm rounded-xl px-4 py-3 focus:bg-white focus:border-neutral-900 outline-none transition-colors"></textarea>
                     </div>
 
                     <!-- SEO Settings -->
                     <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/90 shadow-xs">
                         <div class="flex items-center gap-2 mb-4 border-b border-slate-100 pb-3">
-                            <svg class="w-4 h-4 text-sky-700 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                            <svg class="w-4 h-4 text-neutral-900 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                             <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider">Search Engine Optimization (SEO)</h3>
                         </div>
                         <div class="space-y-4">
                             <div>
                                 <label class="text-xs font-bold text-slate-700 block mb-1">Focus Keywords</label>
-                                <input type="text" name="focus_keywords" placeholder="e.g. sinhala novels, martin wickramasinghe" class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-3.5 py-2 text-xs sm:text-sm focus:bg-white focus:border-sky-700 outline-none">
+                                <input type="text" name="focus_keywords" placeholder="e.g. mens shirt, slim fit blazer, cotton chinos, formal wear" class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-3.5 py-2 text-xs sm:text-sm focus:bg-white focus:border-neutral-900 outline-none">
                             </div>
                             <div>
                                 <label class="text-xs font-bold text-slate-700 block mb-1">Meta Title</label>
@@ -455,24 +455,24 @@ function renderCategories($tree, $level = 0) {
                         </div>
 
                         <div class="grid grid-cols-2 gap-2.5 pt-2 border-t border-slate-100">
-                            <button type="submit" name="save_draft" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition">Draft</button>
-                            <button type="submit" name="publish" class="bg-sky-700 hover:bg-sky-800 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition shadow-md shadow-sky-700/20">Publish</button>
+                            <button type="submit" name="save_draft" class="bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition">Draft</button>
+                            <button type="submit" name="publish" class="bg-neutral-900 hover:bg-black text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition shadow-sm">Publish</button>
                         </div>
                     </div>
 
                     <!-- Categories -->
                     <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/90 shadow-xs">
-                        <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider mb-3 border-b border-slate-100 pb-2.5">Book Categories</h3>
+                        <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider mb-3 border-b border-slate-100 pb-2.5">Product Categories</h3>
                         <div class="max-h-60 overflow-y-auto pr-1 bg-slate-50/70 p-3 rounded-2xl border border-slate-200">
                             <?php renderCategories($categoryTree); ?>
                         </div>
                     </div>
 
-                    <!-- Publisher / Brand -->
+                    <!-- Brand -->
                     <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/90 shadow-xs">
-                        <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider mb-3 border-b border-slate-100 pb-2.5">Publisher / Imprint</h3>
-                        <select name="brand_id" class="w-full bg-slate-50 border border-slate-200 text-slate-800 font-medium rounded-xl px-3.5 py-2.5 text-xs sm:text-sm focus:bg-white focus:border-sky-700 outline-none cursor-pointer">
-                            <option value="">Select Publisher...</option>
+                        <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider mb-3 border-b border-slate-100 pb-2.5">Brand</h3>
+                        <select name="brand_id" class="w-full bg-slate-50 border border-slate-200 text-slate-800 font-medium rounded-xl px-3.5 py-2.5 text-xs sm:text-sm focus:bg-white focus:border-neutral-900 outline-none cursor-pointer">
+                            <option value="">Select Brand...</option>
                             <?php foreach ($brands as $brand): ?>
                                 <option value="<?php echo $brand['id']; ?>">
                                     <?php echo htmlspecialchars($brand['name']); ?>
@@ -484,27 +484,27 @@ function renderCategories($tree, $level = 0) {
                     <!-- Product Tags -->
                     <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/90 shadow-xs">
                         <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider mb-3 border-b border-slate-100 pb-2.5">Tags</h3>
-                        <input type="text" name="tags" placeholder="Novel, Fiction, Translations" class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-3.5 py-2 text-xs sm:text-sm focus:bg-white focus:border-sky-700 outline-none">
+                        <input type="text" name="tags" placeholder="Shirts, Formal Wear, Slim Fit, Casual, Luxury" class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-3.5 py-2 text-xs sm:text-sm focus:bg-white focus:border-neutral-900 outline-none">
                         <p class="text-[10px] text-slate-400 mt-1.5">Separate with commas.</p>
                     </div>
 
-                    <!-- Book Cover Image with Removable Preview -->
+                    <!-- Main Product Image with Removable Preview -->
                     <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/90 shadow-xs">
-                        <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider mb-2 border-b border-slate-100 pb-2">Book Cover Image *</h3>
+                        <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider mb-2 border-b border-slate-100 pb-2">Main Product Image *</h3>
                         
                         <!-- Main Image Upload Zone -->
-                        <div id="main_image_dropzone" class="relative border-2 border-dashed border-slate-200 hover:border-sky-700 rounded-2xl p-4 text-center bg-slate-50/50 hover:bg-sky-50/30 transition-all cursor-pointer">
+                        <div id="main_image_dropzone" class="relative border-2 border-dashed border-slate-200 hover:border-neutral-900 rounded-2xl p-4 text-center bg-slate-50/50 hover:bg-neutral-50 transition-all cursor-pointer">
                             <input type="file" id="main_image_input" name="main_image" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                             <div class="flex flex-col items-center justify-center py-2">
-                                <svg class="w-8 h-8 text-sky-700 mb-2 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                                <span class="text-xs font-bold text-slate-700">Choose Cover Image</span>
-                                <span class="text-[10px] text-slate-400 mt-0.5">JPEG, PNG, or WEBP (2:3 recommended)</span>
+                                <svg class="w-8 h-8 text-neutral-800 mb-2 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                                <span class="text-xs font-bold text-slate-700">Choose Product Image</span>
+                                <span class="text-[10px] text-slate-400 mt-0.5">JPEG, PNG, or WEBP (3:4 or square recommended)</span>
                             </div>
                         </div>
 
                         <!-- Removable Main Preview Container (Initially Hidden) -->
                         <div id="main_image_preview_container" class="hidden mt-3 relative text-center bg-slate-50 p-2.5 rounded-2xl border border-slate-200">
-                            <img id="main_image_preview" src="" alt="Cover Preview" class="w-32 aspect-[2/3] object-cover rounded-xl border border-slate-300 mx-auto shadow-xs">
+                            <img id="main_image_preview" src="" alt="Product Preview" class="w-32 aspect-[3/4] object-cover rounded-xl border border-slate-300 mx-auto shadow-xs">
                             <button type="button" id="remove_main_image_btn" class="absolute top-2 right-2 bg-rose-600 hover:bg-rose-700 text-white rounded-full p-1.5 shadow-md transition-transform active:scale-95" title="Remove image">
                                 <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                             </button>
@@ -554,7 +554,7 @@ function renderCategories($tree, $level = 0) {
 
         $(document).ready(function() {
             $('.select2-multiple').select2({
-                placeholder: "Search and select titles...",
+                placeholder: "Search and select products...",
                 allowClear: true,
                 width: '100%' 
             });

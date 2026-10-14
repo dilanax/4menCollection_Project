@@ -87,12 +87,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
             if (!empty($id)) {
                 $stmt = $pdo->prepare("UPDATE brands SET name=?, slug=?, image=? WHERE id=?");
                 $stmt->execute([$name, $slug, $image_path, $id]);
-                $_SESSION['swal_msg'] = "Publisher / Brand updated successfully!";
+                $_SESSION['swal_msg'] = "Brand updated successfully!";
                 $_SESSION['swal_type'] = "success";
             } else {
                 $stmt = $pdo->prepare("INSERT INTO brands (name, slug, image) VALUES (?, ?, ?)");
                 $stmt->execute([$name, $slug, $image_path]);
-                $_SESSION['swal_msg'] = "New publisher / brand added successfully!";
+                $_SESSION['swal_msg'] = "New brand added successfully!";
                 $_SESSION['swal_type'] = "success";
             }
         } catch (PDOException $e) {
@@ -114,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
             $check_prod = $pdo->prepare("SELECT COUNT(*) FROM products WHERE brand_id = ?");
             $check_prod->execute([$delete_id]);
             if ($check_prod->fetchColumn() > 0) {
-                throw new Exception("Cannot delete: Books or products are currently linked to this brand.");
+                throw new Exception("Cannot delete: Products are currently linked to this brand.");
             }
 
             // Get image to delete from server
@@ -130,7 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
                 @unlink("../../" . $img); 
             }
 
-            $_SESSION['swal_msg'] = "Publisher / Brand deleted safely.";
+            $_SESSION['swal_msg'] = "Brand deleted safely.";
             $_SESSION['swal_type'] = "success";
         } catch (Exception $e) {
             $_SESSION['swal_msg'] = $e->getMessage();
