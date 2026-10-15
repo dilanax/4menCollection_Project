@@ -4,6 +4,7 @@ $current_path = $_SERVER['REQUEST_URI'] ?? '';
 
 // Pending Pre-orders count එක dynamic ලෙස ලබා ගැනීම
 $pending_preorder_count = 0;
+$unread_contact_count = 0;
 if (isset($pdo) && $pdo instanceof PDO) {
     try {
         $po_cnt_stmt = $pdo->query("SELECT COUNT(*) FROM product_preorders WHERE status = 'pending'");
@@ -12,6 +13,28 @@ if (isset($pdo) && $pdo instanceof PDO) {
         }
     } catch (Throwable $e) {
         $pending_preorder_count = 0;
+    }
+
+    if (!empty($GLOBALS['db_is_mock'])) {
+        try {
+            require_once __DIR__ . '/../../config/contact_messages_db.php';
+            $contact_database = getContactMessagesDatabase($pdo);
+            $contact_cnt_stmt = $contact_database->query('SELECT COUNT(*) FROM contact_messages WHERE is_read = 0');
+            if ($contact_cnt_stmt) {
+                $unread_contact_count = (int)$contact_cnt_stmt->fetchColumn();
+            }
+        } catch (Throwable $e) {
+            $unread_contact_count = 0;
+        }
+    } else {
+        try {
+            $contact_cnt_stmt = $pdo->query('SELECT COUNT(*) FROM contact_messages WHERE is_read = 0');
+            if ($contact_cnt_stmt) {
+                $unread_contact_count = (int)$contact_cnt_stmt->fetchColumn();
+            }
+        } catch (Throwable $e) {
+            $unread_contact_count = 0;
+        }
     }
 }
 ?>
@@ -207,6 +230,18 @@ if (isset($pdo) && $pdo instanceof PDO) {
         <a href="/admin/customer/users/users.php" data-tooltip="Users" class="nav-item relative flex items-center px-3.5 py-2.5 rounded-xl text-sm transition-all duration-200 <?php echo (strpos($current_path, 'users.php') !== false || strpos($current_path, 'customers.php') !== false) ? 'bg-white text-black font-semibold shadow-sm' : 'hover:bg-neutral-900 hover:text-white text-neutral-300 font-medium'; ?>">
             <svg width="20" height="20" class="nav-icon w-5 h-5 shrink-0 transition-all duration-200 <?php echo (strpos($current_path, 'users') === false) ? 'mr-3' : 'mr-3 text-black'; ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
             <span class="nav-text whitespace-nowrap sidebar-transition">Users</span>
+        </a>
+
+        <a href="/admin/customer/contact_messages.php" data-tooltip="Contact Messages" class="nav-item relative flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm transition-all duration-200 <?php echo (strpos($current_path, 'contact_messages.php') !== false) ? 'bg-white text-black font-semibold shadow-sm' : 'hover:bg-neutral-900 hover:text-white text-neutral-300 font-medium'; ?>">
+            <span class="flex min-w-0 items-center">
+                <svg width="20" height="20" class="nav-icon w-5 h-5 shrink-0 transition-all duration-200 <?php echo (strpos($current_path, 'contact_messages.php') === false) ? 'mr-3' : 'mr-3 text-black'; ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6.75A2.25 2.25 0 015.25 4.5h13.5A2.25 2.25 0 0121 6.75v10.5a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 17.25V6.75zm.75-.75L12 12.75 20.25 6"></path></svg>
+                <span class="nav-text whitespace-nowrap sidebar-transition">Contact Messages</span>
+            </span>
+            <?php if ($unread_contact_count > 0): ?>
+                <span class="nav-badge ml-auto rounded-full bg-white px-2 py-0.5 text-xs font-semibold text-black shadow-xs <?= (strpos($current_path, 'contact_messages.php') !== false) ? '!bg-black !text-white' : ''; ?>">
+                    <?= $unread_contact_count; ?>
+                </span>
+            <?php endif; ?>
         </a>
 
         <a href="/admin/gateway/payment_controller.php" data-tooltip="Payments" class="nav-item relative flex items-center px-3.5 py-2.5 rounded-xl text-sm transition-all duration-200 <?php echo (strpos($current_path, 'gateway') !== false) ? 'bg-white text-black font-semibold shadow-sm' : 'hover:bg-neutral-900 hover:text-white text-neutral-300 font-medium'; ?>">

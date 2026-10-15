@@ -3,12 +3,17 @@
 $isOnSale = !empty($p['sale_price']) && (float)$p['sale_price'] > 0;
 $regularPrice = (float)($p['regular_price'] ?? 0);
 $currentPrice = $isOnSale ? (float)$p['sale_price'] : $regularPrice;
-$imageSrc = !empty($p['main_image']) ? '/' . ltrim(htmlspecialchars($p['main_image'], ENT_QUOTES, 'UTF-8'), '/') : null;
+$imagePath = trim((string)($p['main_image'] ?? ''));
+$escapedImagePath = htmlspecialchars($imagePath, ENT_QUOTES, 'UTF-8');
+$imageSrc = $imagePath === ''
+    ? null
+    : (preg_match('~^https?://~i', $imagePath) ? $escapedImagePath : '/' . ltrim($escapedImagePath, '/'));
 $brandName = !empty($p['brand_name']) ? htmlspecialchars($p['brand_name']) : '';
 $productName = htmlspecialchars($p['name'] ?? 'Product', ENT_QUOTES, 'UTF-8');
 $productType = $p['type'] ?? 'simple';
 $productUrl = "/product/" . htmlspecialchars($p['slug'] ?? '', ENT_QUOTES, 'UTF-8');
 $isOutOfStock = (($p['stock_status'] ?? '') === 'outofstock');
+$isShopCard = !empty($shop_card_variant);
 
 $discountPct = 0;
 if ($isOnSale && $regularPrice > 0) {
@@ -38,9 +43,9 @@ if (isset($p['avg_rating']) && $p['avg_rating'] !== null) {
 }
 ?>
 
-<div class="group relative bg-white border border-neutral-200 hover:border-neutral-900 hover:shadow-xl rounded-xl transition-all duration-300 flex flex-col h-full overflow-hidden">
+<div class="<?= $isShopCard ? 'shop-product-card group relative flex h-full flex-col overflow-hidden bg-transparent transition-all duration-300' : 'group relative flex h-full flex-col overflow-hidden rounded-xl border border-neutral-200 bg-white transition-all duration-300 hover:border-neutral-900 hover:shadow-xl'; ?>">
     
-    <div class="relative w-full aspect-[2/3] bg-neutral-100 overflow-hidden border-b border-neutral-100 rounded-t-xl">
+    <div class="relative w-full <?= $isShopCard ? 'aspect-[3/4] bg-[#eeefed]' : 'aspect-[2/3] rounded-t-xl border-b border-neutral-100 bg-neutral-100'; ?> overflow-hidden">
         
         <!-- Top-Left Discount / Stock Badge -->
         <?php if ($isOnSale): ?>
@@ -80,7 +85,7 @@ if (isset($p['avg_rating']) && $p['avg_rating'] !== null) {
         </a>
 
         <!-- Slide-Up Action Bar on Hover (Add to Cart & Quick View) -->
-        <div class="absolute inset-x-0 bottom-0 p-2.5 z-20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out bg-gradient-to-t from-slate-950/80 via-slate-950/40 to-transparent flex items-center gap-1.5">
+        <div class="<?= $isShopCard ? 'shop-product-actions absolute inset-x-0 bottom-0 z-20 flex translate-y-full items-center gap-2 bg-gradient-to-t from-black/60 to-transparent p-3 transition-transform duration-300 ease-in-out group-hover:translate-y-0' : 'absolute inset-x-0 bottom-0 z-20 flex translate-y-full items-center gap-1.5 bg-gradient-to-t from-slate-950/80 via-slate-950/40 to-transparent p-2.5 transition-transform duration-300 ease-in-out group-hover:translate-y-0'; ?>">
             
             <?php if ($productType === 'variable'): ?>
                 <a href="<?= $productUrl; ?>" class="flex-1 py-2 bg-neutral-900 hover:bg-neutral-700 text-white text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-1 transition-colors shadow-sm rounded-lg">
@@ -138,14 +143,14 @@ if (isset($p['avg_rating']) && $p['avg_rating'] !== null) {
     </div>
 
     <!-- 2. Typography & Details -->
-    <div class="p-3.5 sm:p-4 flex flex-col flex-1 bg-white rounded-b-2xl">
+    <div class="<?= $isShopCard ? 'flex flex-1 flex-col bg-transparent pt-3' : 'flex flex-1 flex-col rounded-b-2xl bg-white p-3.5 sm:p-4'; ?>">
         
-        <span class="text-[10px] sm:text-[11px] font-bold text-neutral-500 uppercase tracking-widest truncate mb-1">
+        <span class="<?= $isShopCard ? 'mb-1 truncate text-[9px] font-bold uppercase tracking-[.16em] text-neutral-500 sm:text-[10px]' : 'mb-1 truncate text-[10px] font-bold uppercase tracking-widest text-neutral-500 sm:text-[11px]'; ?>">
             <?= $brandName ?: '4MEN Collection'; ?>
         </span>
 
         <h3 class="mb-1.5 leading-snug">
-            <a href="<?= $productUrl; ?>" class="font-bold text-slate-900 text-xs sm:text-sm hover:text-neutral-500 line-clamp-2 transition-colors">
+            <a href="<?= $productUrl; ?>" class="<?= $isShopCard ? 'line-clamp-2 text-xs font-semibold leading-snug text-neutral-900 transition-colors hover:text-neutral-500 sm:text-sm' : 'line-clamp-2 text-xs font-bold text-slate-900 transition-colors hover:text-neutral-500 sm:text-sm'; ?>">
                 <?= $productName; ?>
             </a>
         </h3>
@@ -178,7 +183,7 @@ if (isset($p['avg_rating']) && $p['avg_rating'] !== null) {
         </div>
 
         <!-- Pricing Section -->
-        <div class="mt-auto pt-2 border-t border-slate-100 flex items-baseline gap-2">
+        <div class="<?= $isShopCard ? 'mt-auto flex items-baseline gap-2 pt-1' : 'mt-auto flex items-baseline gap-2 border-t border-slate-100 pt-2'; ?>">
             <?php if ($productType === 'variable'): ?>
                 <span class="text-[10px] font-bold text-slate-400 uppercase">From</span>
                 <?php if ($regularPrice > 0): ?>

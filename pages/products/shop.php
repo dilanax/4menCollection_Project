@@ -140,9 +140,11 @@ if ($is_ajax && isset($_GET['action']) && $_GET['action'] === 'load_more') {
     if (ob_get_length()) ob_clean();
     header('Content-Type: application/json');
     ob_start();
+    $shop_card_variant = true;
     foreach ($products as $p) {
         include __DIR__ . '/cards/product_card_1.php';
     }
+    unset($shop_card_variant);
     $html = ob_get_clean();
 
     echo json_encode([
@@ -253,6 +255,12 @@ $active_filter_count += ($min_price > 0 || $max_price < 100000) ? 1 : 0;
         outline-offset: 2px;
     }
 
+    @media (hover: none) {
+        .shop-product-card .shop-product-actions {
+            transform: translateY(0);
+        }
+    }
+
     .filter-scrollbar::-webkit-scrollbar {
         width: 4px;
     }
@@ -284,17 +292,10 @@ $active_filter_count += ($min_price > 0 || $max_price < 100000) ? 1 : 0;
                     <h1 class="text-4xl font-black uppercase leading-[.98] tracking-[-.06em] sm:text-5xl lg:text-6xl">Wear it<br class="sm:hidden"> your way.</h1>
                     <p class="mt-4 max-w-lg text-sm leading-6 text-white/65 sm:text-base">Considered menswear, made for wherever the day takes you. Find your next everyday essential.</p>
                 </div>
-                <div class="flex flex-col items-start gap-4 sm:flex-row sm:items-center lg:flex-col lg:items-end lg:pb-1">
-                    <p class="text-xs font-medium text-white/65">
-                        <span id="showing-count" class="font-bold text-white"><?= min($total_items, count($products)); ?></span>
-                        <span> of </span>
-                        <span id="total-count" class="font-bold text-white"><?= $total_items; ?></span>
-                        <span> pieces</span>
-                    </p>
-                    <button onclick="toggleMobileFilter()" class="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-5 py-3 text-[11px] font-bold uppercase tracking-[.12em] text-white transition hover:border-white hover:bg-white hover:text-neutral-950 lg:hidden">
-                        <svg class="h-4 w-4 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M7 12h10m-7 5h4"/></svg>
-                        Filters <span class="rounded-full bg-white/15 px-2 py-0.5 text-[10px]"><?= $active_filter_count; ?></span>
-                    </button>
+                <div class="flex items-center gap-4 text-[10px] font-bold uppercase tracking-[.16em] text-white/65 lg:pb-1">
+                    <span>New season</span>
+                    <span class="h-1 w-1 rounded-full bg-white/60" aria-hidden="true"></span>
+                    <span>Everyday essentials</span>
                 </div>
             </div>
         </div>
@@ -302,16 +303,16 @@ $active_filter_count += ($min_price > 0 || $max_price < 100000) ? 1 : 0;
         <div class="flex flex-col items-start gap-6 lg:flex-row lg:gap-8">
             
             <!-- Mobile Backdrop -->
-            <div id="filter-overlay" onclick="toggleMobileFilter()" class="fixed inset-0 z-40 hidden bg-black/60 backdrop-blur-sm transition-opacity duration-300 lg:hidden"></div>
+            <div id="filter-overlay" onclick="toggleMobileFilter()" class="fixed inset-0 z-40 hidden bg-black/60 backdrop-blur-sm transition-opacity duration-300" aria-hidden="true"></div>
 
-            <!-- ==================== 1. FIXED / STICKY FILTER SIDEBAR ==================== -->
-            <aside id="filter-sidebar" class="fixed inset-y-0 left-0 z-50 w-80 -translate-x-full transform overflow-y-auto bg-white pr-1 transition-transform duration-300 filter-scrollbar lg:sticky lg:top-24 lg:z-10 lg:max-h-[calc(100vh-7rem)] lg:w-64 lg:translate-x-0 lg:bg-transparent xl:w-72">
+            <!-- Filter drawer -->
+            <aside id="filter-sidebar" role="dialog" aria-modal="true" aria-label="Shop filters" class="fixed inset-y-0 left-0 z-50 w-80 max-w-[88vw] -translate-x-full transform overflow-y-auto bg-white pr-1 shadow-2xl transition-transform duration-300 filter-scrollbar">
                 
-                <div class="flex flex-col space-y-4 p-6 lg:p-0">
+                <div class="flex flex-col space-y-4 p-6">
                     
-                    <div class="flex items-center justify-between pb-3 border-b border-slate-200 lg:hidden">
+                    <div class="flex items-center justify-between border-b border-slate-200 pb-3">
                         <span class="text-sm font-black uppercase tracking-wider text-slate-900">Refine your search</span>
-                        <button onclick="toggleMobileFilter()" class="text-slate-500 hover:text-slate-800 p-1 text-lg">✕</button>
+                        <button type="button" onclick="toggleMobileFilter()" aria-label="Close filters" aria-controls="filter-sidebar" aria-expanded="false" class="p-1 text-lg text-slate-500 hover:text-slate-800">✕</button>
                     </div>
 
                     <form action="/shop" method="GET" id="filter-form" class="space-y-4">
@@ -559,37 +560,45 @@ $active_filter_count += ($min_price > 0 || $max_price < 100000) ? 1 : 0;
             </aside>
 
             <!-- ==================== 2. PRODUCT GRID SECTION ==================== -->
-            <div class="flex-1 w-full space-y-4">
+            <div class="w-full space-y-4">
                 
                 <!-- Collection toolbar -->
                 <div class="flex flex-col gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:px-5">
                     <div>
                         <span class="text-xs font-black uppercase tracking-[.14em] text-neutral-900">Shop all</span>
-                        <p class="mt-1 text-[11px] text-slate-500">Curated essentials for every day</p>
+                        <p class="mt-1 text-[11px] text-slate-500"><span id="showing-count" class="font-semibold text-neutral-800"><?= min($total_items, count($products)); ?></span> of <?= $total_items; ?> styles</p>
                     </div>
                     
-                    <div class="flex items-center gap-2">
-                        <label class="hidden text-[10px] font-bold uppercase tracking-[.14em] text-slate-500 sm:block">Sort by</label>
-                        <div class="relative inline-block">
-                            <select form="filter-form" name="sort" onchange="document.getElementById('filter-form').submit();" class="appearance-none text-xs bg-slate-50 border border-slate-200 pl-3 pr-8 py-2 font-bold text-slate-700 outline-none rounded-xl cursor-pointer focus:border-sky-700 transition-colors">
-                                <option value="newest" <?= $sort_by == 'newest' ? 'selected' : ''; ?>>Newest First</option>
-                                <option value="price_low" <?= $sort_by == 'price_low' ? 'selected' : ''; ?>>Price: Low to High</option>
-                                <option value="price_high" <?= $sort_by == 'price_high' ? 'selected' : ''; ?>>Price: High to Low</option>
-                                <option value="name_asc" <?= $sort_by == 'name_asc' ? 'selected' : ''; ?>>Name: A to Z</option>
-                            </select>
-                            <span class="absolute right-2.5 top-3 pointer-events-none text-slate-500">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                            </span>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button type="button" onclick="toggleMobileFilter()" aria-controls="filter-sidebar" aria-expanded="false" class="inline-flex items-center gap-2 rounded-full border border-neutral-300 bg-white px-4 py-2.5 text-[10px] font-bold uppercase tracking-[.12em] text-neutral-900 transition hover:border-neutral-900">
+                            <svg class="h-4 w-4 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M7 12h10m-7 5h4"/></svg>
+                            Filter <span class="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px]"><?= $active_filter_count; ?></span>
+                        </button>
+                        <div class="flex items-center gap-2">
+                            <label for="shop-sort" class="hidden text-[10px] font-bold uppercase tracking-[.14em] text-slate-500 sm:block">Sort</label>
+                            <div class="relative inline-block">
+                                <select id="shop-sort" form="filter-form" name="sort" onchange="document.getElementById('filter-form').submit();" class="appearance-none rounded-full border border-slate-200 bg-white py-2.5 pl-4 pr-9 text-xs font-semibold text-slate-700 outline-none transition-colors focus:border-neutral-900">
+                                    <option value="newest" <?= $sort_by == 'newest' ? 'selected' : ''; ?>>New arrivals</option>
+                                    <option value="price_low" <?= $sort_by == 'price_low' ? 'selected' : ''; ?>>Price: Low to High</option>
+                                    <option value="price_high" <?= $sort_by == 'price_high' ? 'selected' : ''; ?>>Price: High to Low</option>
+                                    <option value="name_asc" <?= $sort_by == 'name_asc' ? 'selected' : ''; ?>>Name: A to Z</option>
+                                </select>
+                                <span class="pointer-events-none absolute right-3 top-3 text-slate-500">
+                                    <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7"/></svg>
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Responsive product grid -->
                 <?php if (!empty($products)): ?>
-                    <div id="products-grid" class="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
+                    <div id="products-grid" class="grid grid-cols-2 gap-x-3 gap-y-7 sm:gap-x-5 sm:gap-y-9 md:grid-cols-3 lg:grid-cols-4">
+                        <?php $shop_card_variant = true; ?>
                         <?php foreach ($products as $p): ?>
                             <?php include __DIR__ . '/cards/product_card_1.php'; ?>
                         <?php endforeach; ?>
+                        <?php unset($shop_card_variant); ?>
                     </div>
 
                     <!-- 20-by-20 AJAX Load More Button Container -->
@@ -632,8 +641,9 @@ $active_filter_count += ($min_price > 0 || $max_price < 100000) ? 1 : 0;
     function toggleMobileFilter() {
         const sidebar = document.getElementById('filter-sidebar');
         const overlay = document.getElementById('filter-overlay');
+        const isClosed = sidebar.classList.contains('-translate-x-full');
         
-        if (sidebar.classList.contains('-translate-x-full')) {
+        if (isClosed) {
             sidebar.classList.remove('-translate-x-full');
             overlay.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
@@ -642,7 +652,17 @@ $active_filter_count += ($min_price > 0 || $max_price < 100000) ? 1 : 0;
             overlay.classList.add('hidden');
             document.body.style.overflow = '';
         }
+
+        document.querySelectorAll('[aria-controls="filter-sidebar"]').forEach(button => {
+            button.setAttribute('aria-expanded', String(isClosed));
+        });
     }
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && !document.getElementById('filter-sidebar').classList.contains('-translate-x-full')) {
+            toggleMobileFilter();
+        }
+    });
 
     // Client-side Filter Search for Authors in Sidebar
     document.getElementById('author-filter-search')?.addEventListener('input', function(e) {
