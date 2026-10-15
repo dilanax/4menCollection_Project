@@ -12,7 +12,7 @@ if (isset($_GET['categories']) && is_array($_GET['categories'])) {
     $categories_filter = [trim($_GET['slug'])];
 }
 
-// Flexible Brands/Publishers Input Handling (Supports: brands[] and brand)
+// Flexible Brand Input Handling (Supports: brands[] and brand)
 $brands_filter = [];
 if (isset($_GET['brands']) && is_array($_GET['brands'])) {
     $brands_filter = array_filter($_GET['brands']);
@@ -135,7 +135,7 @@ $stmt->bindValue(count($params) + 2, $offset, PDO::PARAM_INT);
 $stmt->execute();
 $products = $stmt->fetchAll();
 
-// 4. AJAX Load More Handling (Books Grid)
+// 4. AJAX Load More Handling (Product Grid)
 if ($is_ajax && isset($_GET['action']) && $_GET['action'] === 'load_more') {
     if (ob_get_length()) ob_clean();
     header('Content-Type: application/json');
@@ -181,14 +181,76 @@ try {
 } catch (Throwable $e) {
     $authors = [];
 }
+
+$active_filter_count = count($categories_filter) + count($brands_filter) + count($authors_filter) + count($stock_filters);
+$active_filter_count += !empty($search_query) ? 1 : 0;
+$active_filter_count += ($min_price > 0 || $max_price < 100000) ? 1 : 0;
 ?>
 
-<!-- Poppins Font Setup and Scroll Customization -->
+<!-- Shop page presentation -->
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
-    
-    .shop-container, .shop-container * {
-        font-family: 'Poppins', sans-serif;
+    .shop-container {
+        background: #f7f7f5;
+    }
+
+    .shop-editorial {
+        background:
+            radial-gradient(ellipse at 82% 120%, rgba(255, 255, 255, .12), transparent 38%),
+            linear-gradient(115deg, #111 0%, #202020 62%, #30302e 100%);
+    }
+
+    .shop-editorial-pattern {
+        background-image: linear-gradient(135deg, transparent 49.5%, rgba(255, 255, 255, .06) 50%, transparent 50.5%);
+        background-size: 34px 34px;
+    }
+
+    .shop-container input:focus,
+    .shop-container select:focus {
+        outline: 2px solid rgba(17, 17, 17, .18);
+        outline-offset: 1px;
+    }
+
+    .shop-container .text-sky-700 {
+        color: #171717 !important;
+    }
+
+    .shop-container .bg-sky-700,
+    .shop-container input[type="checkbox"]:checked + div {
+        background-color: #171717 !important;
+    }
+
+    .shop-container .border-sky-700,
+    .shop-container input[type="checkbox"]:checked + div {
+        border-color: #171717 !important;
+    }
+
+    .shop-container input[type="checkbox"]:checked + div svg {
+        display: block !important;
+    }
+
+    .shop-container .bg-sky-50 {
+        background-color: #f4f4f2 !important;
+    }
+
+    .shop-container .border-sky-100 {
+        border-color: #e5e5e2 !important;
+    }
+
+    .shop-container .hover\:bg-sky-800:hover {
+        background-color: #333 !important;
+    }
+
+    .shop-container .hover\:text-sky-800:hover {
+        color: #333 !important;
+    }
+
+    .shop-container .hover\:border-sky-700:hover {
+        border-color: #171717 !important;
+    }
+
+    .shop-container input[type="checkbox"]:focus-visible + div {
+        outline: 2px solid #111;
+        outline-offset: 2px;
     }
 
     .filter-scrollbar::-webkit-scrollbar {
@@ -206,43 +268,49 @@ try {
     }
 </style>
 
-<div class="shop-container bg-[#f8fafc] py-6 sm:py-8 min-h-screen text-slate-800">
-    <div class="w-full px-4 sm:px-6 lg:px-8 xl:px-12">
+<div class="shop-container min-h-screen py-6 text-slate-800 sm:py-10">
+    <div class="mx-auto w-full max-w-[1600px] px-4 sm:px-6 lg:px-10 xl:px-12">
         
-        <!-- Header & Counter -->
-        <div class="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-4">
-            <div>
-                <nav class="flex items-center text-xs font-semibold text-slate-400 mb-2 gap-2">
-                    <a href="/" class="hover:text-sky-700 transition-colors">Home</a>
-                    <span>/</span>
-                    <span class="text-sky-700 font-bold">Book Catalog</span>
-                </nav>
-                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">
-                    Explore Bookstore
-                </h1>
-                <p class="text-xs text-slate-500 mt-1">
-                    Showing <span id="showing-count" class="font-bold text-slate-900"><?= min($total_items, count($products)); ?></span> of <span id="total-count" class="font-bold text-slate-900"><?= $total_items; ?></span> titles
-                </p>
+        <div class="shop-editorial relative mb-8 overflow-hidden rounded-2xl text-white shadow-xl sm:mb-10">
+            <div class="shop-editorial-pattern pointer-events-none absolute inset-0 opacity-40"></div>
+            <div class="relative flex flex-col gap-8 px-6 py-8 sm:px-10 sm:py-10 lg:flex-row lg:items-end lg:justify-between lg:px-14 lg:py-12">
+                <div class="max-w-2xl">
+                    <nav class="mb-5 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.18em] text-white/55">
+                        <a href="/" class="transition hover:text-white">Home</a>
+                        <span aria-hidden="true">/</span>
+                        <span class="text-white/90">Shop</span>
+                    </nav>
+                    <p class="mb-3 text-[10px] font-bold uppercase tracking-[.28em] text-white/60">The 4MEN collection</p>
+                    <h1 class="text-4xl font-black uppercase leading-[.98] tracking-[-.06em] sm:text-5xl lg:text-6xl">Wear it<br class="sm:hidden"> your way.</h1>
+                    <p class="mt-4 max-w-lg text-sm leading-6 text-white/65 sm:text-base">Considered menswear, made for wherever the day takes you. Find your next everyday essential.</p>
+                </div>
+                <div class="flex flex-col items-start gap-4 sm:flex-row sm:items-center lg:flex-col lg:items-end lg:pb-1">
+                    <p class="text-xs font-medium text-white/65">
+                        <span id="showing-count" class="font-bold text-white"><?= min($total_items, count($products)); ?></span>
+                        <span> of </span>
+                        <span id="total-count" class="font-bold text-white"><?= $total_items; ?></span>
+                        <span> pieces</span>
+                    </p>
+                    <button onclick="toggleMobileFilter()" class="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-5 py-3 text-[11px] font-bold uppercase tracking-[.12em] text-white transition hover:border-white hover:bg-white hover:text-neutral-950 lg:hidden">
+                        <svg class="h-4 w-4 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M7 12h10m-7 5h4"/></svg>
+                        Filters <span class="rounded-full bg-white/15 px-2 py-0.5 text-[10px]"><?= $active_filter_count; ?></span>
+                    </button>
+                </div>
             </div>
-            
-            <button onclick="toggleMobileFilter()" class="lg:hidden w-full md:w-auto bg-white border border-slate-300 text-slate-800 px-4 py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-xs hover:border-sky-700 transition-colors">
-                <svg class="w-4 h-4 text-sky-700 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
-                Filter Books (<?= count($categories_filter) + count($brands_filter) + count($authors_filter) + count($stock_filters); ?> Active)
-            </button>
         </div>
 
-        <div class="flex flex-col lg:flex-row gap-6 items-start">
+        <div class="flex flex-col items-start gap-6 lg:flex-row lg:gap-8">
             
             <!-- Mobile Backdrop -->
-            <div id="filter-overlay" onclick="toggleMobileFilter()" class="fixed inset-0 bg-slate-950/60 z-40 hidden lg:hidden backdrop-blur-xs transition-opacity duration-300"></div>
+            <div id="filter-overlay" onclick="toggleMobileFilter()" class="fixed inset-0 z-40 hidden bg-black/60 backdrop-blur-sm transition-opacity duration-300 lg:hidden"></div>
 
             <!-- ==================== 1. FIXED / STICKY FILTER SIDEBAR ==================== -->
-            <aside id="filter-sidebar" class="fixed inset-y-0 left-0 w-80 bg-white z-50 transform -translate-x-full transition-transform duration-300 lg:translate-x-0 lg:static lg:w-64 xl:w-72 lg:bg-transparent lg:z-10 shrink-0 lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] overflow-y-auto filter-scrollbar pr-1">
+            <aside id="filter-sidebar" class="fixed inset-y-0 left-0 z-50 w-80 -translate-x-full transform overflow-y-auto bg-white pr-1 transition-transform duration-300 filter-scrollbar lg:sticky lg:top-24 lg:z-10 lg:max-h-[calc(100vh-7rem)] lg:w-64 lg:translate-x-0 lg:bg-transparent xl:w-72">
                 
-                <div class="p-6 lg:p-0 flex flex-col space-y-4">
+                <div class="flex flex-col space-y-4 p-6 lg:p-0">
                     
                     <div class="flex items-center justify-between pb-3 border-b border-slate-200 lg:hidden">
-                        <span class="text-sm font-black text-slate-900 tracking-wider uppercase">Filter Books</span>
+                        <span class="text-sm font-black uppercase tracking-wider text-slate-900">Refine your search</span>
                         <button onclick="toggleMobileFilter()" class="text-slate-500 hover:text-slate-800 p-1 text-lg">✕</button>
                     </div>
 
@@ -250,13 +318,13 @@ try {
                         
                         <!-- Search Box -->
                         <div class="bg-white border border-slate-200/90 p-4 rounded-2xl shadow-xs transition-all hover:border-slate-300">
-                            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Search Catalog</label>
+                            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">Find your fit</label>
                             <div class="relative">
                                 <input 
                                     type="text" 
                                     name="search" 
                                     value="<?= htmlspecialchars($search_query, ENT_QUOTES, 'UTF-8'); ?>" 
-                                    placeholder="Title, ISBN, author..." 
+                                    placeholder="Search styles, names..."
                                     class="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 text-xs text-slate-800 rounded-xl focus:bg-white focus:border-sky-700 outline-none transition-colors"
                                 >
                                 <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-3 pointer-events-none stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -266,7 +334,7 @@ try {
                         <!-- Categories Filter Checkboxes -->
                         <div class="bg-white border border-slate-200/90 p-4 rounded-2xl shadow-xs transition-all hover:border-slate-300">
                             <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
-                                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Categories</span>
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Categories</span>
                                 <?php if (!empty($categories_filter)): ?>
                                     <span class="text-[10px] font-bold text-sky-700 bg-sky-50 border border-sky-100 px-2 py-0.5 rounded-md"><?= count($categories_filter); ?> active</span>
                                 <?php endif; ?>
@@ -301,7 +369,7 @@ try {
                         <?php if (!empty($authors)): ?>
                             <div class="bg-white border border-slate-200/90 p-4 rounded-2xl shadow-xs transition-all hover:border-slate-300">
                                 <div class="flex items-center justify-between mb-2 border-b border-slate-100 pb-2">
-                                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Authors</span>
+                                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Collections</span>
                                     <?php if (!empty($authors_filter)): ?>
                                         <span class="text-[10px] font-bold text-sky-700 bg-sky-50 border border-sky-100 px-2 py-0.5 rounded-md"><?= count($authors_filter); ?> active</span>
                                     <?php endif; ?>
@@ -311,7 +379,7 @@ try {
                                     <input 
                                         type="text" 
                                         id="author-filter-search" 
-                                        placeholder="Search authors..." 
+                                        placeholder="Search collections..."
                                         class="w-full pl-7 pr-2.5 py-1.5 bg-slate-50 border border-slate-200 text-[11px] text-slate-800 rounded-lg outline-none focus:bg-white focus:border-sky-700 transition-colors"
                                     >
                                     <svg class="w-3 h-3 text-slate-400 absolute left-2 top-2.5 pointer-events-none stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -363,10 +431,10 @@ try {
                             </div>
                         <?php endif; ?>
 
-                        <!-- Publishers Checkboxes -->
+                        <!-- Brand Checkboxes -->
                         <div class="bg-white border border-slate-200/90 p-4 rounded-2xl shadow-xs transition-all hover:border-slate-300">
                             <div class="flex items-center justify-between mb-2 border-b border-slate-100 pb-2">
-                                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Publishers</span>
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Brands</span>
                                 <?php if (!empty($brands_filter)): ?>
                                     <span class="text-[10px] font-bold text-sky-700 bg-sky-50 border border-sky-100 px-2 py-0.5 rounded-md"><?= count($brands_filter); ?> active</span>
                                 <?php endif; ?>
@@ -376,13 +444,13 @@ try {
                                 <input 
                                     type="text" 
                                     id="brand-filter-search" 
-                                    placeholder="Search publishers..." 
+                                    placeholder="Search brands..."
                                     class="w-full pl-7 pr-2.5 py-1.5 bg-slate-50 border border-slate-200 text-[11px] text-slate-800 rounded-lg outline-none focus:bg-white focus:border-sky-700 transition-colors"
                                 >
                                 <svg class="w-3 h-3 text-slate-400 absolute left-2 top-2.5 pointer-events-none stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                             </div>
 
-                            <div id="publisher-checkbox-list" class="space-y-2 max-h-48 overflow-y-auto filter-scrollbar pr-1">
+                            <div id="brand-checkbox-list" class="space-y-2 max-h-48 overflow-y-auto filter-scrollbar pr-1">
                                 <?php 
                                 $b_index = 0;
                                 foreach ($brands as $b): 
@@ -391,7 +459,7 @@ try {
                                         $isChecked = in_array($b['id'], $brands_filter);
                                         $isHidden = ($b_index > 8 && !$isChecked);
                                 ?>
-                                    <label class="publisher-filter-item flex items-center justify-between cursor-pointer group select-none py-0.5 <?= $isHidden ? 'hidden' : ''; ?>" data-name="<?= strtolower(htmlspecialchars($b['name'])); ?>">
+                                    <label class="brand-filter-item flex items-center justify-between cursor-pointer group select-none py-0.5 <?= $isHidden ? 'hidden' : ''; ?>" data-name="<?= strtolower(htmlspecialchars($b['name'])); ?>">
                                         <div class="flex items-center gap-2.5">
                                             <div class="relative flex items-center">
                                                 <input 
@@ -418,7 +486,7 @@ try {
                                 <div class="pt-2 mt-1 border-t border-slate-100 text-center">
                                     <button 
                                         type="button" 
-                                        id="load-more-publishers-btn" 
+                                        id="load-more-brands-btn"
                                         class="text-[11px] font-bold text-sky-700 hover:text-sky-800 hover:underline inline-flex items-center gap-1"
                                     >
                                         <span>Show More (+<?= max(0, $b_index - 8); ?>)</span>
@@ -445,7 +513,7 @@ try {
                                             <svg class="w-2.5 h-2.5 text-white stroke-[3] hidden peer-checked:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                                         </div>
                                     </div>
-                                    <span class="text-xs text-slate-700">In Stock Titles</span>
+                                    <span class="text-xs text-slate-700">Available now</span>
                                 </label>
 
                                 <label class="flex items-center gap-2.5 cursor-pointer select-none py-0.5">
@@ -461,14 +529,14 @@ try {
                                             <svg class="w-2.5 h-2.5 text-white stroke-[3] hidden peer-checked:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                                         </div>
                                     </div>
-                                    <span class="text-xs text-rose-600 font-bold">Discounted Offers</span>
+                                    <span class="text-xs text-rose-600 font-bold">On sale</span>
                                 </label>
                             </div>
                         </div>
 
                         <!-- Price Range Box -->
                         <div class="bg-white border border-slate-200/90 p-4 rounded-2xl shadow-xs transition-all hover:border-slate-300">
-                            <span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3 border-b border-slate-100 pb-2">Price Range (Rs.)</span>
+                            <span class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-3 border-b border-slate-100 pb-2">Price range (Rs.)</span>
                             <div class="flex items-center gap-2 mb-3">
                                 <input type="number" name="min_price" value="<?= $min_price > 0 ? $min_price : ''; ?>" placeholder="Min" class="w-full bg-slate-50 border border-slate-200 text-xs px-2.5 py-2 text-center rounded-xl outline-none focus:bg-white focus:border-sky-700 transition-colors">
                                 <span class="text-slate-400 text-xs">-</span>
@@ -477,7 +545,7 @@ try {
                         </div>
 
                         <button type="submit" class="w-full bg-sky-700 hover:bg-sky-800 text-white font-bold text-xs py-3 uppercase tracking-wider rounded-xl transition-all shadow-md shadow-sky-700/20 active:scale-98">
-                            Apply Filters
+                            Show results
                         </button>
 
                         <?php if (!empty($search_query) || !empty($categories_filter) || !empty($brands_filter) || !empty($authors_filter) || !empty($stock_filters) || $min_price > 0 || $max_price < 100000): ?>
@@ -493,18 +561,21 @@ try {
             <!-- ==================== 2. PRODUCT GRID SECTION ==================== -->
             <div class="flex-1 w-full space-y-4">
                 
-                <!-- Styled Sort Bar -->
-                <div class="bg-white border border-slate-200/90 p-3 rounded-2xl flex justify-between items-center shadow-xs">
-                    <span class="text-xs font-black text-slate-800 tracking-wider uppercase">Books Available</span>
+                <!-- Collection toolbar -->
+                <div class="flex flex-col gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                    <div>
+                        <span class="text-xs font-black uppercase tracking-[.14em] text-neutral-900">Shop all</span>
+                        <p class="mt-1 text-[11px] text-slate-500">Curated essentials for every day</p>
+                    </div>
                     
                     <div class="flex items-center gap-2">
-                        <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider hidden sm:block">Sort By:</label>
+                        <label class="hidden text-[10px] font-bold uppercase tracking-[.14em] text-slate-500 sm:block">Sort by</label>
                         <div class="relative inline-block">
                             <select form="filter-form" name="sort" onchange="document.getElementById('filter-form').submit();" class="appearance-none text-xs bg-slate-50 border border-slate-200 pl-3 pr-8 py-2 font-bold text-slate-700 outline-none rounded-xl cursor-pointer focus:border-sky-700 transition-colors">
                                 <option value="newest" <?= $sort_by == 'newest' ? 'selected' : ''; ?>>Newest First</option>
                                 <option value="price_low" <?= $sort_by == 'price_low' ? 'selected' : ''; ?>>Price: Low to High</option>
                                 <option value="price_high" <?= $sort_by == 'price_high' ? 'selected' : ''; ?>>Price: High to Low</option>
-                                <option value="name_asc" <?= $sort_by == 'name_asc' ? 'selected' : ''; ?>>Title: A to Z</option>
+                                <option value="name_asc" <?= $sort_by == 'name_asc' ? 'selected' : ''; ?>>Name: A to Z</option>
                             </select>
                             <span class="absolute right-2.5 top-3 pointer-events-none text-slate-500">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
@@ -513,9 +584,9 @@ try {
                     </div>
                 </div>
 
-                <!-- Books Responsive Grid -->
+                <!-- Responsive product grid -->
                 <?php if (!empty($products)): ?>
-                    <div id="books-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4">
+                    <div id="products-grid" class="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
                         <?php foreach ($products as $p): ?>
                             <?php include __DIR__ . '/cards/product_card_1.php'; ?>
                         <?php endforeach; ?>
@@ -528,9 +599,9 @@ try {
                             id="load-more-btn"
                             data-page="<?= $current_page + 1; ?>"
                             data-total-pages="<?= $total_pages; ?>"
-                            class="inline-flex items-center justify-center gap-2 bg-white hover:bg-sky-700 hover:text-white text-slate-800 border-2 border-slate-200 hover:border-sky-700 px-8 py-3.5 text-xs font-black uppercase tracking-widest transition-all duration-300 rounded-2xl shadow-xs active:scale-95 group"
+                            class="inline-flex items-center justify-center gap-2 rounded-full border border-neutral-900 bg-neutral-900 px-8 py-3.5 text-xs font-black uppercase tracking-[.14em] text-white shadow-sm transition-all duration-300 hover:bg-neutral-700 hover:border-neutral-700 active:scale-95 group"
                         >
-                            <span class="btn-text">Load More Books (+20)</span>
+                            <span class="btn-text">Load more pieces (+20)</span>
                             <span class="btn-spinner hidden">
                                 <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                             </span>
@@ -538,11 +609,14 @@ try {
                     </div>
 
                 <?php else: ?>
-                    <div class="bg-white border border-slate-200/90 p-12 text-center rounded-3xl shadow-xs">
-                        <p class="text-sm font-bold text-slate-800 mb-1">No matching titles found</p>
-                        <p class="text-xs text-slate-400 mb-6">Try clearing or unchecking some of your active filters.</p>
-                        <a href="/shop" class="inline-block bg-sky-700 text-white text-xs font-bold px-6 py-2.5 rounded-xl uppercase tracking-wider hover:bg-sky-800 transition-colors shadow-xs">
-                            Clear Filters
+                    <div class="rounded-2xl border border-neutral-200 bg-white px-6 py-16 text-center shadow-sm sm:px-12">
+                        <div class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-neutral-100 text-neutral-500">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m16 16 4 4"/></svg>
+                        </div>
+                        <p class="mb-2 text-lg font-bold tracking-tight text-neutral-900">Nothing in this edit just yet.</p>
+                        <p class="mb-6 text-sm text-slate-500">Try adjusting your filters or explore the full collection.</p>
+                        <a href="/shop" class="inline-flex rounded-full bg-neutral-900 px-6 py-3 text-[11px] font-bold uppercase tracking-[.14em] text-white transition hover:bg-neutral-700">
+                            View all pieces
                         </a>
                     </div>
                 <?php endif; ?>
@@ -608,14 +682,14 @@ try {
         this.parentElement.classList.add('hidden');
     });
 
-    // Client-side Filter Search for Publishers in Sidebar
+    // Client-side Filter Search for Brands in Sidebar
     document.getElementById('brand-filter-search')?.addEventListener('input', function(e) {
         const query = e.target.value.toLowerCase().trim();
-        const items = document.querySelectorAll('.publisher-filter-item');
-        const loadMorePubsBtn = document.getElementById('load-more-publishers-btn');
+        const items = document.querySelectorAll('.brand-filter-item');
+        const loadMoreBrandsBtn = document.getElementById('load-more-brands-btn');
         
         if (query.length > 0) {
-            if (loadMorePubsBtn) loadMorePubsBtn.parentElement.classList.add('hidden');
+            if (loadMoreBrandsBtn) loadMoreBrandsBtn.parentElement.classList.add('hidden');
             items.forEach(item => {
                 const name = item.getAttribute('data-name') || '';
                 if (name.includes(query)) {
@@ -625,7 +699,7 @@ try {
                 }
             });
         } else {
-            if (loadMorePubsBtn) loadMorePubsBtn.parentElement.classList.remove('hidden');
+            if (loadMoreBrandsBtn) loadMoreBrandsBtn.parentElement.classList.remove('hidden');
             let count = 0;
             items.forEach(item => {
                 const isChecked = item.querySelector('input[type="checkbox"]')?.checked;
@@ -639,18 +713,18 @@ try {
         }
     });
 
-    // Load More Publishers in Sidebar Toggle
-    document.getElementById('load-more-publishers-btn')?.addEventListener('click', function() {
-        const hiddenItems = document.querySelectorAll('.publisher-filter-item.hidden');
+    // Load More Brands in Sidebar Toggle
+    document.getElementById('load-more-brands-btn')?.addEventListener('click', function() {
+        const hiddenItems = document.querySelectorAll('.brand-filter-item.hidden');
         hiddenItems.forEach(el => el.classList.remove('hidden'));
         this.parentElement.classList.add('hidden');
     });
 
-    // AJAX 20-by-20 Load More Logic for Books
+    // AJAX 20-by-20 Load More Logic for Products
     document.addEventListener("DOMContentLoaded", function() {
         const loadMoreBtn = document.getElementById('load-more-btn');
         const loadMoreContainer = document.getElementById('load-more-container');
-        const booksGrid = document.getElementById('books-grid');
+        const productsGrid = document.getElementById('products-grid');
         const showingCountSpan = document.getElementById('showing-count');
 
         if (loadMoreBtn) {
@@ -677,7 +751,7 @@ try {
                 .then(res => res.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        booksGrid.insertAdjacentHTML('beforeend', data.html);
+                        productsGrid.insertAdjacentHTML('beforeend', data.html);
 
                         if (showingCountSpan) {
                             showingCountSpan.innerText = data.loaded_count;
@@ -692,7 +766,7 @@ try {
                             loadMoreContainer.classList.add('hidden');
                         }
                     } else {
-                        alert('Unable to load more books.');
+                        alert('Unable to load more products.');
                         btn.disabled = false;
                         textSpan.classList.remove('hidden');
                         spinnerSpan.classList.add('hidden');

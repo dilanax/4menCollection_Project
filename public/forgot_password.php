@@ -154,16 +154,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             if ($upd_stmt->execute([$token, $expire_time, $user['id']])) {
 
                 // 4. Reset Link එක සාදා Email යැවීම
-                $reset_link = "https://readershub.lk/reset-password?token=" . $token;
+                $reset_link = "http://localhost:8000/reset-password?token=" . $token;
 
-                $subject = "Password Reset Request - ReadersHub";
+                $subject = "Password Reset Request - 4MEN Collection";
                 $body = "
                     <p>Hello <strong>" . htmlspecialchars($user['username']) . "</strong>,</p>
-                    <p>We received a request to reset your password on ReadersHub. Click the button below to choose a new password:</p>
-                    <div style='margin: 24px 0;'>
-                        <a href='" . $reset_link . "' style='background:#0369a1; color:#ffffff; padding:12px 26px; border-radius:12px; text-decoration:none; font-weight:bold; font-size:13px; display:inline-block;'>Reset My Password &rarr;</a>
+                    <p>We received a request to reset your password on 4MEN Collection. Click the button below to choose a new password:</p>
+                    <div style='margin: 28px 0;'>
+                        <a href='" . $reset_link . "' style='background:#000000; color:#ffffff; padding:13px 30px; border-radius:12px; text-decoration:none; font-weight:bold; font-size:13px; display:inline-block; text-transform:uppercase; letter-spacing:0.05em;'>Reset My Password &rarr;</a>
                     </div>
-                    <p style='color:#64748b; font-size:12px; line-height: 1.5;'>This link will automatically expire in 1 hour.<br>If you did not make this request, you can safely ignore this email.</p>
+                    <p style='color:#6b7280; font-size:12px; line-height: 1.5;'>This link will automatically expire in 1 hour.<br>If you did not make this request, you can safely ignore this email.</p>
                 ";
 
                 if (sendResetZohoMail($pdo, $email, $user['username'], $subject, $body)) {
@@ -188,26 +188,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 }
 ?>
 
-<script>document.title = "Forgot Password | ReadersHub";</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script>document.title = "Reset Password | 4MEN COLLECTION";</script>
 
-<div class="min-h-[80vh] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[#f8fafc]" style="font-family: 'Poppins', sans-serif;">
+<div class="min-h-[80vh] flex flex-col justify-center py-12 sm:py-16 px-4 sm:px-6 lg:px-8 relative selection:bg-black selection:text-white" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+    
+    <div class="absolute inset-0 pointer-events-none overflow-hidden -z-10">
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-neutral-100 dark:bg-neutral-800/20 rounded-full blur-3xl opacity-70"></div>
+    </div>
+
     <div class="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <div class="w-12 h-12 bg-sky-50 text-sky-700 border border-sky-200 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-xs">
-            <svg class="w-6 h-6 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"/></svg>
-        </div>
-        <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+        <!-- 4MEN COLLECTION Admin-Style Monochrome Logo -->
+        <a href="/" class="inline-flex items-center gap-3.5 group mb-6 transition-transform duration-200 hover:scale-[1.02]">
+            <div class="w-12 h-12 rounded-2xl bg-black text-white flex items-center justify-center font-black text-base shadow-lg shadow-black/15 shrink-0 tracking-tight border border-black group-hover:bg-neutral-900 transition-colors">
+                4M
+            </div>
+            <div class="flex flex-col text-left leading-tight">
+                <span class="text-xl font-black tracking-wider text-neutral-900 dark:text-white uppercase">4MEN</span>
+                <span class="text-[10px] font-bold tracking-[0.26em] text-neutral-500 uppercase mt-0.5">COLLECTION</span>
+            </div>
+        </a>
+
+        <h1 class="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white tracking-tight">
             Reset Password
-        </h2>
-        <p class="mt-1 text-xs sm:text-sm text-slate-500 font-medium">
-            Enter your registered email address and we'll send you an instant reset link.
+        </h1>
+        <p class="mt-2 text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 font-medium">
+            Enter your registered email address and we'll send you an instant reset link
         </p>
     </div>
 
-    <div class="mt-6 sm:mx-auto sm:w-full sm:max-w-md">
-        <div class="bg-white py-8 px-6 sm:px-10 rounded-3xl border border-slate-200/90 shadow-sm">
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="bg-white dark:bg-neutral-900 py-9 px-6 sm:px-10 rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-xl shadow-neutral-900/5">
 
             <?php if ($message): ?>
-                <div class="mb-5 p-3.5 rounded-xl text-xs font-semibold flex items-center gap-2.5 <?= $messageType === 'success' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-rose-50 text-rose-800 border border-rose-200'; ?>">
+                <div class="mb-6 p-4 rounded-2xl text-xs sm:text-sm font-semibold flex items-center gap-3 <?= $messageType === 'success' ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800/60' : 'bg-rose-50 dark:bg-rose-950/40 text-rose-900 dark:text-rose-200 border border-rose-200 dark:border-rose-800/60'; ?>">
+                    <svg class="w-5 h-5 flex-shrink-0 <?= $messageType === 'success' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'; ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="<?= $messageType === 'success' ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' : 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'; ?>"/>
+                    </svg>
                     <span><?= htmlspecialchars($message); ?></span>
                 </div>
             <?php endif; ?>
@@ -216,30 +235,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 <input type="hidden" name="action" value="forgot_password">
 
                 <div>
-                    <label for="email" class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5">
+                    <label for="email" class="block text-[11px] font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider mb-2">
                         Registered Email Address
                     </label>
-                    <input 
-                        id="email" 
-                        name="email" 
-                        type="email" 
-                        autocomplete="email" 
-                        required 
-                        placeholder="name@example.com"
-                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:bg-white focus:border-sky-700 outline-none transition"
-                    >
+                    <div class="relative">
+                        <input 
+                            id="email" 
+                            name="email" 
+                            type="email" 
+                            autocomplete="email" 
+                            required 
+                            placeholder="your@email.com"
+                            class="w-full pl-11 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700/80 rounded-2xl text-xs sm:text-sm text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 focus:bg-white dark:focus:bg-neutral-900 focus:border-black dark:focus:border-white focus:ring-4 focus:ring-neutral-900/5 dark:focus:ring-white/5 outline-none transition font-medium"
+                        >
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-neutral-400 dark:text-neutral-500">
+                            <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                        </span>
+                    </div>
                 </div>
 
-                <button 
-                    type="submit" 
-                    class="w-full flex justify-center py-3.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-sky-700 hover:bg-sky-800 transition shadow-md shadow-sky-700/20 active:scale-98"
-                >
-                    Send Reset Link
-                </button>
+                <div class="pt-2">
+                    <button 
+                        type="submit" 
+                        class="w-full py-4 px-5 rounded-2xl text-xs sm:text-sm font-extrabold uppercase tracking-wider text-white bg-black hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 transition shadow-lg shadow-black/15 hover:shadow-xl active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                        <span>Send Reset Link</span>
+                        <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                        </svg>
+                    </button>
+                </div>
             </form>
 
-            <div class="mt-6 text-center pt-4 border-t border-slate-100">
-                <a href="/login" class="text-xs font-bold text-slate-500 hover:text-sky-700 transition inline-flex items-center gap-1">
+            <div class="mt-7 text-center pt-6 border-t border-neutral-100 dark:border-neutral-800">
+                <a href="/login" class="text-xs font-bold text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white transition inline-flex items-center gap-1.5 hover:underline">
                     <span>&larr; Return to Sign In</span>
                 </a>
             </div>

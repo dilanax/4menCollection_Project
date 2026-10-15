@@ -1,15 +1,18 @@
 <?php
 // $p (product array) required
 $isOnSale = !empty($p['sale_price']) && (float)$p['sale_price'] > 0;
-$currentPrice = $isOnSale ? (float)$p['sale_price'] : (float)$p['regular_price'];
-$imageSrc = !empty($p['main_image']) ? '/' . ltrim(htmlspecialchars($p['main_image']), '/') : '/assets/placeholder.jpg';
+$regularPrice = (float)($p['regular_price'] ?? 0);
+$currentPrice = $isOnSale ? (float)$p['sale_price'] : $regularPrice;
+$imageSrc = !empty($p['main_image']) ? '/' . ltrim(htmlspecialchars($p['main_image'], ENT_QUOTES, 'UTF-8'), '/') : null;
 $brandName = !empty($p['brand_name']) ? htmlspecialchars($p['brand_name']) : '';
-$productUrl = "/product/" . htmlspecialchars($p['slug']);
+$productName = htmlspecialchars($p['name'] ?? 'Product', ENT_QUOTES, 'UTF-8');
+$productType = $p['type'] ?? 'simple';
+$productUrl = "/product/" . htmlspecialchars($p['slug'] ?? '', ENT_QUOTES, 'UTF-8');
 $isOutOfStock = (($p['stock_status'] ?? '') === 'outofstock');
 
 $discountPct = 0;
-if ($isOnSale && (float)$p['regular_price'] > 0) {
-    $discountPct = round((((float)$p['regular_price'] - $currentPrice) / (float)$p['regular_price']) * 100);
+if ($isOnSale && $regularPrice > 0) {
+    $discountPct = round((($regularPrice - $currentPrice) / $regularPrice) * 100);
 }
 
 // 5 Star Rating Logic (No review = 0 rating, all gray stars)
@@ -35,11 +38,9 @@ if (isset($p['avg_rating']) && $p['avg_rating'] !== null) {
 }
 ?>
 
-<!-- Modern Book Card with Rounded Corners & Deep Blue Theme -->
-<div class="group relative bg-white border border-slate-200/90 hover:border-sky-700 hover:shadow-xl rounded-2xl transition-all duration-300 flex flex-col h-full overflow-hidden" style="font-family: 'Poppins', sans-serif;">
+<div class="group relative bg-white border border-neutral-200 hover:border-neutral-900 hover:shadow-xl rounded-xl transition-all duration-300 flex flex-col h-full overflow-hidden">
     
-    <!-- 1. Book Cover Stage (Aspect Ratio 2:3 with full edge-to-edge cover) -->
-    <div class="relative w-full aspect-[2/3] bg-slate-100 overflow-hidden border-b border-slate-100 rounded-t-2xl">
+    <div class="relative w-full aspect-[2/3] bg-neutral-100 overflow-hidden border-b border-neutral-100 rounded-t-xl">
         
         <!-- Top-Left Discount / Stock Badge -->
         <?php if ($isOnSale): ?>
@@ -59,21 +60,30 @@ if (isset($p['avg_rating']) && $p['avg_rating'] !== null) {
             </svg>
         </button>
 
-        <!-- Book Image with Full Cover Fit -->
         <a href="<?= $productUrl; ?>" class="block w-full h-full">
-            <img 
-                src="<?= $imageSrc; ?>" 
-                alt="<?= htmlspecialchars($p['name']); ?>" 
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                loading="lazy"
-            >
+            <?php if ($imageSrc): ?>
+                <img
+                    src="<?= $imageSrc; ?>"
+                    alt="<?= $productName; ?>"
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                    loading="lazy"
+                    onerror="this.hidden = true; this.nextElementSibling.hidden = false;"
+                >
+                <div hidden class="w-full h-full flex items-center justify-center bg-neutral-100 text-neutral-400">
+                    <svg class="w-12 h-12 stroke-[1.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16 3l5 4-3 4-3-2v12H9V9L6 11 3 7l5-4 2 2h4l2-2z"/></svg>
+                </div>
+            <?php else: ?>
+                <div class="w-full h-full flex items-center justify-center bg-neutral-100 text-neutral-400">
+                    <svg class="w-12 h-12 stroke-[1.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16 3l5 4-3 4-3-2v12H9V9L6 11 3 7l5-4 2 2h4l2-2z"/></svg>
+                </div>
+            <?php endif; ?>
         </a>
 
         <!-- Slide-Up Action Bar on Hover (Add to Cart & Quick View) -->
         <div class="absolute inset-x-0 bottom-0 p-2.5 z-20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out bg-gradient-to-t from-slate-950/80 via-slate-950/40 to-transparent flex items-center gap-1.5">
             
-            <?php if ($p['type'] === 'variable'): ?>
-                <a href="<?= $productUrl; ?>" class="flex-1 py-2 bg-sky-700 hover:bg-sky-800 text-white text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-1 transition-colors shadow-sm rounded-lg">
+            <?php if ($productType === 'variable'): ?>
+                <a href="<?= $productUrl; ?>" class="flex-1 py-2 bg-neutral-900 hover:bg-neutral-700 text-white text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-1 transition-colors shadow-sm rounded-lg">
                     <span>Options</span>
                     <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                 </a>
@@ -82,7 +92,7 @@ if (isset($p['avg_rating']) && $p['avg_rating'] !== null) {
                     <button 
                         type="button" 
                         onclick="quickAddToCart(this, <?= (int)$p['id']; ?>)" 
-                        class="flex-1 py-2 bg-sky-700 hover:bg-sky-800 text-white text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors shadow-sm rounded-lg group/btn active:scale-95" 
+                        class="flex-1 py-2 bg-neutral-900 hover:bg-neutral-700 text-white text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors shadow-sm rounded-lg group/btn active:scale-95"
                         title="Add to Cart"
                     >
                         <!-- Default Cart Text & Icon -->
@@ -130,15 +140,13 @@ if (isset($p['avg_rating']) && $p['avg_rating'] !== null) {
     <!-- 2. Typography & Details -->
     <div class="p-3.5 sm:p-4 flex flex-col flex-1 bg-white rounded-b-2xl">
         
-        <!-- Author / Publisher Name -->
-        <span class="text-[10px] sm:text-[11px] font-bold text-sky-800 uppercase tracking-widest truncate mb-1">
-            <?= $brandName ?: 'ReadersHub'; ?>
+        <span class="text-[10px] sm:text-[11px] font-bold text-neutral-500 uppercase tracking-widest truncate mb-1">
+            <?= $brandName ?: '4MEN Collection'; ?>
         </span>
 
-        <!-- Book Title -->
         <h3 class="mb-1.5 leading-snug">
-            <a href="<?= $productUrl; ?>" class="font-bold text-slate-900 text-xs sm:text-sm hover:text-sky-700 line-clamp-2 transition-colors">
-                <?= htmlspecialchars($p['name']); ?>
+            <a href="<?= $productUrl; ?>" class="font-bold text-slate-900 text-xs sm:text-sm hover:text-neutral-500 line-clamp-2 transition-colors">
+                <?= $productName; ?>
             </a>
         </h3>
 
@@ -171,23 +179,31 @@ if (isset($p['avg_rating']) && $p['avg_rating'] !== null) {
 
         <!-- Pricing Section -->
         <div class="mt-auto pt-2 border-t border-slate-100 flex items-baseline gap-2">
-            <?php if ($p['type'] === 'variable'): ?>
+            <?php if ($productType === 'variable'): ?>
                 <span class="text-[10px] font-bold text-slate-400 uppercase">From</span>
-                <span class="text-sm sm:text-base font-black text-slate-900 tracking-tight">
-                    Rs. <?= number_format($p['regular_price'] ?? 0, 2); ?>
-                </span>
+                <?php if ($regularPrice > 0): ?>
+                    <span class="text-sm sm:text-base font-black text-slate-900 tracking-tight">
+                        Rs. <?= number_format($regularPrice, 2); ?>
+                    </span>
+                <?php else: ?>
+                    <span class="text-xs font-semibold text-neutral-500">View details</span>
+                <?php endif; ?>
             <?php else: ?>
                 <?php if ($isOnSale): ?>
                     <span class="text-sm sm:text-base font-black text-rose-600 tracking-tight">
                         Rs. <?= number_format($p['sale_price'], 2); ?>
                     </span>
                     <span class="text-xs font-semibold text-slate-400 line-through">
-                        Rs. <?= number_format($p['regular_price'], 2); ?>
+                        Rs. <?= number_format($regularPrice, 2); ?>
                     </span>
                 <?php else: ?>
-                    <span class="text-sm sm:text-base font-black text-slate-900 tracking-tight">
-                        Rs. <?= number_format($p['regular_price'] ?? 0, 2); ?>
-                    </span>
+                    <?php if ($regularPrice > 0): ?>
+                        <span class="text-sm sm:text-base font-black text-slate-900 tracking-tight">
+                            Rs. <?= number_format($regularPrice, 2); ?>
+                        </span>
+                    <?php else: ?>
+                        <span class="text-xs font-semibold text-neutral-500">View details</span>
+                    <?php endif; ?>
                 <?php endif; ?>
             <?php endif; ?>
         </div>
@@ -202,7 +218,7 @@ define('QUICK_CART_SCRIPT_LOADED', true);
 ?>
 <script>
     // Universal Toast Notification Handler
-    function triggerUniversalToast(message = 'Book added to your cart!') {
+    function triggerUniversalToast(message = 'Item added to your shopping bag!') {
         let toast = document.getElementById('toast-container');
         
         if (!toast) {
@@ -210,15 +226,15 @@ define('QUICK_CART_SCRIPT_LOADED', true);
             toast.id = 'toast-container';
             toast.className = 'fixed top-24 right-5 z-[9999] transform translate-x-full transition-all duration-300 opacity-0 pointer-events-none';
             toast.innerHTML = `
-                <div class="bg-white border-l-4 border-sky-700 shadow-2xl p-4 flex items-center gap-3.5 min-w-[300px] max-w-sm rounded-xl border border-slate-200 pointer-events-auto" style="font-family: 'Poppins', sans-serif;">
-                    <div class="w-10 h-10 rounded-lg bg-sky-50 text-sky-700 flex items-center justify-center shrink-0 border border-sky-200">
+                <div class="bg-white border-l-4 border-neutral-900 shadow-2xl p-4 flex items-center gap-3.5 min-w-[300px] max-w-sm rounded-xl border border-neutral-200 pointer-events-auto">
+                    <div class="w-10 h-10 rounded-lg bg-neutral-100 text-neutral-900 flex items-center justify-center shrink-0 border border-neutral-200">
                         <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                     </div>
                     <div class="flex-1 min-w-0">
                         <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">Added to Basket!</h4>
                         <p id="toast-msg" class="text-xs text-slate-500 font-medium truncate mt-0.5">${message}</p>
                     </div>
-                    <a href="/cart" class="text-xs font-bold text-sky-700 hover:text-sky-800 bg-sky-50 px-2.5 py-1.5 rounded-lg transition shrink-0">View Cart</a>
+                    <a href="/cart" class="text-xs font-bold text-neutral-900 hover:text-neutral-600 bg-neutral-100 px-2.5 py-1.5 rounded-lg transition shrink-0">View Bag</a>
                 </div>
             `;
             document.body.appendChild(toast);
@@ -271,7 +287,7 @@ define('QUICK_CART_SCRIPT_LOADED', true);
             btn.classList.remove('is-loading');
             btn.classList.add('is-success');
 
-            const alertMsg = data.message || 'Book added to your cart!';
+            const alertMsg = data.message || 'Item added to your shopping bag!';
 
             document.dispatchEvent(new CustomEvent('cartUpdated', { 
                 detail: { 
@@ -291,7 +307,7 @@ define('QUICK_CART_SCRIPT_LOADED', true);
             console.error('Cart Error:', error);
             btn.classList.remove('is-loading');
             btn.disabled = false;
-            alert('Failed to add book to cart. Please try again.');
+            alert('Failed to add item to your bag. Please try again.');
         });
     }
 </script>

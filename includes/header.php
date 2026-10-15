@@ -1,10 +1,10 @@
 <?php
-// Session ආරම්භ කිරීම
+// Session Initialization
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Database connection fallback for header
+// Database Connection Fallback for Header
 if (!isset($pdo) || !($pdo instanceof PDO)) {
     if (file_exists('config/db.php')) {
         require_once 'config/db.php';
@@ -13,10 +13,10 @@ if (!isset($pdo) || !($pdo instanceof PDO)) {
     }
 }
 
-// Excluded category slugs/names
+// Excluded Category Slugs / Names
 $excluded_category_names = ['vinura ransika', 'vinura-ransika', 'vinura_ransika'];
 
-// Fetch categories from Database
+// Fetch Categories from Database
 $db_categories = [];
 try {
     if (isset($pdo) && $pdo instanceof PDO) {
@@ -56,7 +56,7 @@ foreach ($sub_categories as $pid => $children) {
     }
 }
 
-// Cart Quantity සහ සත්‍ය Subtotal ගණනය කිරීම (Database Price Lookup Fallback)
+// Cart Quantity & Total Calculation
 $cart_count = 0;
 $cart_total = 0.00;
 if (isset($_SESSION['cart']) && is_array($_SESSION['cart']) && !empty($_SESSION['cart'])) {
@@ -100,7 +100,7 @@ if (isset($_SESSION['cart']) && is_array($_SESSION['cart']) && !empty($_SESSION[
     }
 }
 
-// Username එක ලබා ගැනීම
+// User Display Name
 $display_name = 'User';
 if (!empty($_SESSION['user_name'])) {
     $display_name = $_SESSION['user_name'];
@@ -111,140 +111,136 @@ if (!empty($_SESSION['user_name'])) {
 $current_uri = $_SERVER['REQUEST_URI'] ?? '/';
 ?>
 <!DOCTYPE html>
-<html lang="si" class="h-full">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ReadersHub | Modern Online Bookshop</title>
+    <title>4MEN COLLECTION | Luxury Men's Fashion & Apparel</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class'
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    letterSpacing: {
+                        'widest-luxury': '0.22em',
+                    }
+                }
+            }
         };
     </script>
+    
+    <!-- Google Fonts: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <style>
-        body, * { font-family: 'Poppins', sans-serif; }
+        body, * {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        /* Clean storefront navigation */
+        .carnage-navbar {
+            background-color: rgba(255, 255, 255, 0.76);
+            backdrop-filter: saturate(180%) blur(18px);
+            -webkit-backdrop-filter: saturate(180%) blur(18px);
+            border-bottom: 1px solid rgba(17, 24, 39, 0.06);
+            transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease, transform 0.25s ease;
+        }
+        .carnage-navbar.home-hero-navbar {
+            margin-bottom: -80px;
+            background-color: transparent;
+            border-bottom-color: transparent;
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+        .carnage-navbar.scrolled {
+            background-color: rgba(255, 255, 255, 0.94);
+            border-bottom-color: rgba(17, 24, 39, 0.1);
+            box-shadow: 0 8px 24px -18px rgba(0, 0, 0, 0.34);
+        }
+        .carnage-navbar.home-hero-navbar:not(.scrolled) .universal-drawer-trigger,
+        .carnage-navbar.home-hero-navbar:not(.scrolled) #search-toggle-btn,
+        .carnage-navbar.home-hero-navbar:not(.scrolled) .relative.group > a[aria-label="Account"],
+        .carnage-navbar.home-hero-navbar:not(.scrolled) > div > div > div > a[aria-label="Cart"],
+        .carnage-navbar.home-hero-navbar:not(.scrolled) nav a,
+        .carnage-navbar.home-hero-navbar:not(.scrolled) nav button {
+            color: #fff !important;
+        }
+        .carnage-navbar.home-hero-navbar:not(.scrolled) nav a > span:last-child {
+            background-color: #fff;
+        }
+        .carnage-navbar.home-hero-navbar:not(.scrolled) .universal-drawer-trigger:hover,
+        .carnage-navbar.home-hero-navbar:not(.scrolled) #search-toggle-btn:hover,
+        .carnage-navbar.home-hero-navbar:not(.scrolled) .relative.group > a[aria-label="Account"]:hover,
+        .carnage-navbar.home-hero-navbar:not(.scrolled) > div > div > div > a[aria-label="Cart"]:hover {
+            background-color: rgba(255, 255, 255, 0.12);
+        }
+        .carnage-navbar.home-hero-navbar:not(.scrolled) .w-9.h-9,
+        .carnage-navbar.home-hero-navbar:not(.scrolled) .sm\:w-10.sm\:h-10 {
+            background-color: #fff;
+            color: #111;
+        }
+        .carnage-navbar.home-hero-navbar:not(.scrolled) a[href="/"] .text-neutral-900,
+        .carnage-navbar.home-hero-navbar:not(.scrolled) a[href="/"] .text-neutral-500 {
+            color: #fff !important;
+        }
+        .carnage-navbar.home-hero-navbar.scrolled {
+            background-color: rgba(0, 0, 0, 0.96);
+            border-bottom-color: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 8px 24px -18px rgba(0, 0, 0, 0.7);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+        .carnage-navbar.home-hero-navbar.scrolled .universal-drawer-trigger,
+        .carnage-navbar.home-hero-navbar.scrolled #search-toggle-btn,
+        .carnage-navbar.home-hero-navbar.scrolled .relative.group > a[aria-label="Account"],
+        .carnage-navbar.home-hero-navbar.scrolled > div > div > div > a[aria-label="Cart"],
+        .carnage-navbar.home-hero-navbar.scrolled nav a,
+        .carnage-navbar.home-hero-navbar.scrolled nav button,
+        .carnage-navbar.home-hero-navbar.scrolled a[href="/"] .text-neutral-900,
+        .carnage-navbar.home-hero-navbar.scrolled a[href="/"] .text-neutral-500 {
+            color: #fff !important;
+        }
+        .carnage-navbar.home-hero-navbar.scrolled nav a > span:last-child {
+            background-color: #fff;
+        }
+        .carnage-navbar.home-hero-navbar.scrolled .universal-drawer-trigger:hover,
+        .carnage-navbar.home-hero-navbar.scrolled #search-toggle-btn:hover,
+        .carnage-navbar.home-hero-navbar.scrolled .relative.group > a[aria-label="Account"]:hover,
+        .carnage-navbar.home-hero-navbar.scrolled > div > div > div > a[aria-label="Cart"]:hover {
+            background-color: rgba(255, 255, 255, 0.12);
+        }
+        .carnage-navbar.home-hero-navbar.scrolled .w-9.h-9,
+        .carnage-navbar.home-hero-navbar.scrolled .sm\:w-10.sm\:h-10 {
+            background-color: #fff;
+            color: #111;
+        }
+        @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+            .carnage-navbar { background-color: rgba(255, 255, 255, 0.96); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .carnage-navbar { transition: none; }
+        }
+        @media (max-width: 639px) {
+            .carnage-navbar.home-hero-navbar { margin-bottom: -72px; }
+        }
+
+        /* Custom Sleek Scrollbar */
         .drawer-scrollbar::-webkit-scrollbar { width: 4px; }
         .drawer-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .drawer-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        .drawer-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-    </style>
-    
-    <style>
-        /* Dark Theme Global Overrides */
-        html.dark {
-            color-scheme: dark;
-        }
-        html.dark body {
-            background-color: #0b0f19 !important;
-            color: #cbd5e1 !important;
-        }
-        html.dark .bg-white,
-        html.dark .bg-\[\#f8fafc\] {
-            background-color: #111827 !important;
-        }
-        html.dark .bg-slate-50,
-        html.dark .bg-slate-50\/50,
-        html.dark .bg-slate-50\/60,
-        html.dark .bg-slate-50\/70,
-        html.dark .bg-slate-50\/80,
-        html.dark .bg-slate-50\/90 {
-            background-color: #1e293b !important;
-        }
-        html.dark .text-slate-900,
-        html.dark .text-slate-800 {
-            color: #f8fafc !important;
-        }
-        html.dark .text-slate-700,
-        html.dark .text-slate-600 {
-            color: #cbd5e1 !important;
-        }
-        html.dark .text-slate-500,
-        html.dark .text-slate-400 {
-            color: #94a3b8 !important;
-        }
-        html.dark .border-slate-200,
-        html.dark .border-slate-200\/90,
-        html.dark .border-slate-100 {
-            border-color: #334155 !important;
-        }
-        html.dark input,
-        html.dark textarea,
-        html.dark select {
-            background-color: #1e293b !important;
-            color: #f8fafc !important;
-            border-color: #475569 !important;
-        }
-
-        /* Header Dark Mode Specific Styling */
-        html.dark header,
-        html.dark header.bg-white\/95 {
-            background-color: rgba(15, 23, 42, 0.95) !important;
-            border-color: #1e293b !important;
-        }
-        html.dark header .text-slate-900,
-        html.dark header .text-slate-800,
-        html.dark header .text-slate-700 {
-            color: #f8fafc !important;
-        }
-        html.dark header form > div,
-        html.dark header .border-slate-200,
-        html.dark header .border-slate-300 {
-            background-color: #1e293b !important;
-            border-color: #334155 !important;
-        }
-        html.dark header input {
-            color: #f8fafc !important;
-        }
-        html.dark header .bg-sky-50 {
-            background-color: #1e293b !important;
-            color: #38bdf8 !important;
-            border-color: #0284c7 !important;
-        }
-        html.dark header .hover\:bg-slate-50:hover,
-        html.dark header .hover\:bg-sky-50:hover {
-            background-color: #1e293b !important;
-        }
-
-        /* Drawer Dark Mode */
-        html.dark #main-drawer {
-            background-color: #0f172a !important;
-            border-color: #1e293b !important;
-        }
-        html.dark #main-drawer .bg-white,
-        html.dark #main-drawer .from-sky-50\/80,
-        html.dark #main-drawer .to-white {
-            background: #1e293b !important;
-            background-color: #1e293b !important;
-        }
-        html.dark #main-drawer .text-slate-900,
-        html.dark #main-drawer .text-slate-800 {
-            color: #f8fafc !important;
-        }
-        html.dark #main-drawer .text-slate-600,
-        html.dark #main-drawer .text-slate-700 {
-            color: #cbd5e1 !important;
-        }
-        html.dark #main-drawer .border-slate-100,
-        html.dark #main-drawer .border-slate-200 {
-            border-color: #334155 !important;
-        }
-        html.dark #main-drawer .bg-slate-50,
-        html.dark #main-drawer .bg-slate-50\/80 {
-            background-color: #0f172a !important;
-        }
-        html.dark #main-drawer .hover\:bg-sky-50:hover,
-        html.dark #main-drawer .hover\:bg-slate-50:hover {
-            background-color: #334155 !important;
-        }
+        .drawer-scrollbar::-webkit-scrollbar-thumb { background: #333333; border-radius: 9999px; }
+        .drawer-scrollbar::-webkit-scrollbar-thumb:hover { background: #555555; }
     </style>
 
     <script>
-        // Default to Light (White) theme unless 'dark' is explicitly saved
         if (localStorage.getItem('theme') === 'dark') {
             document.documentElement.classList.add('dark');
         } else {
@@ -252,320 +248,358 @@ $current_uri = $_SERVER['REQUEST_URI'] ?? '/';
         }
     </script>
 </head>
-<body class="bg-[#f8fafc] text-slate-800 flex flex-col min-h-screen antialiased">
+<body class="bg-white dark:bg-[#09090b] text-neutral-900 dark:text-neutral-100 flex flex-col min-h-screen antialiased selection:bg-black selection:text-white">
 
-<?php if (!empty($db_is_mock)): ?>
-<div class="bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 text-slate-900 text-xs py-2 px-4 text-center font-bold flex items-center justify-center gap-2 shadow-xs z-[1000] relative">
-    <svg class="w-4 h-4 shrink-0 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-    <span><strong>Localhost Preview Mode:</strong> MySQL is currently offline or not imported yet. The site is running with sample 4MEN Collection data. Once you start MySQL in XAMPP, it will automatically connect to your database.</span>
-</div>
-<?php endif; ?>
+    <!-- ========================================================================= -->
+    <!-- 1. MODERN STOREFRONT NAVIGATION: BRAND, SHOP LINKS, AND QUICK ACTIONS -->
+    <!-- ========================================================================= -->
+    <header id="main-navbar" class="carnage-navbar <?= ($current_uri === '/' || parse_url($current_uri, PHP_URL_PATH) === '/home') ? 'home-hero-navbar' : ''; ?> sticky top-0 z-40 w-full text-neutral-900">
+        <div class="w-full px-4 sm:px-6 lg:px-10 xl:px-14">
+            <div class="flex items-center justify-between h-18 sm:h-20 gap-4">
+                
+                <!-- LEFT SIDE: Mobile Menu Trigger + 4MEN COLLECTION Brand Logo -->
+                <div class="flex items-center gap-3.5 shrink-0">
+                    <!-- Mobile Drawer Toggle Trigger -->
+                    <button type="button" class="universal-drawer-trigger lg:hidden rounded-xl p-2 text-neutral-700 transition hover:bg-neutral-100 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400" aria-label="Open Navigation" aria-controls="main-drawer" aria-expanded="false">
+                        <svg class="w-6 h-6 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+                        </svg>
+                    </button>
 
-    <!-- ==================== 1. UNIVERSAL CATEGORIES & SUB-CATEGORIES SIDEBAR ==================== -->
-    <div id="drawer-overlay" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-[998] opacity-0 pointer-events-none transition-opacity duration-300 ease-in-out"></div>
-
-    <aside id="main-drawer" class="fixed top-0 left-0 h-full w-[320px] sm:w-[380px] bg-white z-[999] shadow-2xl transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col overflow-hidden">
-        
-        <!-- Drawer Header -->
-        <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-sky-50/80 to-white">
-            <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-xl bg-sky-700 text-white flex items-center justify-center font-black shadow-sm">
-                    <svg class="w-5 h-5 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
+                    <!-- 4MEN COLLECTION Admin-Style Luxury Brand Logo -->
+                    <a href="/" class="flex items-center gap-2.5 sm:gap-3 group transition-transform duration-200 hover:scale-[1.02] shrink-0">
+                        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-black text-white flex items-center justify-center font-black text-xs sm:text-sm shadow-sm shrink-0 tracking-tight">
+                            4M
+                        </div>
+                        <div class="flex flex-col text-left leading-tight shrink-0">
+                            <span class="text-base sm:text-lg font-black tracking-widest text-neutral-900 uppercase whitespace-nowrap">4MEN</span>
+                            <span class="text-[9px] font-bold tracking-[0.28em] text-neutral-500 uppercase mt-0.5 whitespace-nowrap">COLLECTION</span>
+                        </div>
+                    </a>
                 </div>
-                <div>
-                    <h3 class="font-extrabold text-base text-slate-900 leading-tight">All Categories</h3>
-                    <p class="text-[10px] text-slate-400 font-semibold tracking-wider uppercase">Books & Collections</p>
+
+                <!-- CENTER: Navigation Function Links (Bold, Uppercase, Carnage Style, Strictly 1-Line) -->
+                <nav class="hidden lg:flex items-center justify-center flex-1 flex-nowrap gap-3 lg:gap-4 xl:gap-7 2xl:gap-8 text-[11px] lg:text-xs xl:text-[13px] font-bold uppercase tracking-[0.08em] xl:tracking-[0.12em] whitespace-nowrap px-1 xl:px-4" aria-label="Main navigation">
+                    <a href="/" class="relative py-2 text-neutral-700 hover:text-black transition group shrink-0 whitespace-nowrap <?= ($current_uri === '/' || $current_uri === '/home') ? 'text-black' : '' ?>">
+                        <span class="whitespace-nowrap inline-block">HOME</span>
+                        <span class="absolute bottom-0 left-0 h-[2px] bg-black transition-all duration-200 <?= ($current_uri === '/' || $current_uri === '/home') ? 'w-full' : 'w-0 group-hover:w-full' ?>"></span>
+                    </a>
+
+                    <a href="/shop" class="relative py-2 text-neutral-700 hover:text-black transition group shrink-0 whitespace-nowrap <?= (strpos($current_uri, '/shop') !== false && !isset($_GET['filter'])) ? 'text-black' : '' ?>">
+                        <span class="whitespace-nowrap inline-block">SHOP</span>
+                        <span class="absolute bottom-0 left-0 h-[2px] bg-black transition-all duration-200 <?= (strpos($current_uri, '/shop') !== false && !isset($_GET['filter'])) ? 'w-full' : 'w-0 group-hover:w-full' ?>"></span>
+                    </a>
+
+                    <!-- Collections Dropdown Menu -->
+                    <div class="relative group py-2 shrink-0 whitespace-nowrap">
+                        <button type="button" aria-haspopup="true" class="flex items-center gap-1.5 text-neutral-700 hover:text-black transition focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-4 uppercase tracking-[0.08em] xl:tracking-[0.12em] font-bold whitespace-nowrap shrink-0">
+                            <span class="whitespace-nowrap inline-block">COLLECTIONS</span>
+                            <svg class="w-3.5 h-3.5 stroke-[2.5] text-neutral-400 group-hover:text-black group-hover:rotate-180 transition-transform duration-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+
+                        <!-- Dropdown Menu -->
+                        <div class="absolute top-full left-1/2 -translate-x-1/2 w-64 bg-white/95 backdrop-blur-xl border border-neutral-200 rounded-2xl shadow-xl p-2.5 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 group-focus-within:translate-y-0 z-50">
+                            <div class="space-y-1">
+                                <a href="/shop" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold text-neutral-900 hover:bg-neutral-100 transition">
+                                    <span>View All Apparel</span>
+                                    <span class="text-[9px] bg-white text-black px-1.5 py-0.5 rounded font-black tracking-wider">ALL</span>
+                                </a>
+                                <div class="h-px bg-neutral-100 my-1"></div>
+                                <?php if (!empty($category_tree)): ?>
+                                    <?php foreach (array_slice($category_tree, 0, 7) as $cat): ?>
+                                        <a href="/category/<?= htmlspecialchars($cat['slug']) ?>" class="flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-semibold text-neutral-600 hover:text-black hover:bg-neutral-100 transition">
+                                            <span><?= htmlspecialchars($cat['name']) ?></span>
+                                            <svg class="w-3 h-3 stroke-[2] text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                                        </a>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <a href="/shop" class="block px-3.5 py-2 text-xs text-neutral-600 hover:text-black">Suits & Blazers</a>
+                                    <a href="/shop" class="block px-3.5 py-2 text-xs text-neutral-600 hover:text-black">Oxford Shirts</a>
+                                    <a href="/shop" class="block px-3.5 py-2 text-xs text-neutral-600 hover:text-black">Trousers & Chinos</a>
+                                    <a href="/shop" class="block px-3.5 py-2 text-xs text-neutral-600 hover:text-black">Luxury Polos</a>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="/shop?filter=new" class="relative py-2 text-neutral-700 hover:text-black transition group shrink-0 whitespace-nowrap <?= (isset($_GET['filter']) && $_GET['filter'] === 'new') ? 'text-black' : '' ?>">
+                        <span class="whitespace-nowrap inline-block">NEW&nbsp;ARRIVALS</span>
+                        <span class="absolute bottom-0 left-0 h-[2px] bg-black transition-all duration-200 <?= (isset($_GET['filter']) && $_GET['filter'] === 'new') ? 'w-full' : 'w-0 group-hover:w-full' ?>"></span>
+                    </a>
+
+                    <a href="/about" class="relative py-2 text-neutral-700 hover:text-black transition group shrink-0 whitespace-nowrap <?= (strpos($current_uri, '/about') !== false) ? 'text-black' : '' ?>">
+                        <span class="whitespace-nowrap inline-block">ABOUT&nbsp;US</span>
+                        <span class="absolute bottom-0 left-0 h-[2px] bg-black transition-all duration-200 <?= (strpos($current_uri, '/about') !== false) ? 'w-full' : 'w-0 group-hover:w-full' ?>"></span>
+                    </a>
+
+                    <a href="/contact" class="relative py-2 text-neutral-700 hover:text-black transition group shrink-0 whitespace-nowrap <?= (strpos($current_uri, '/contact') !== false) ? 'text-black' : '' ?>">
+                        <span class="whitespace-nowrap inline-block">CONTACT</span>
+                        <span class="absolute bottom-0 left-0 h-[2px] bg-black transition-all duration-200 <?= (strpos($current_uri, '/contact') !== false) ? 'w-full' : 'w-0 group-hover:w-full' ?>"></span>
+                    </a>
+                </nav>
+
+                <!-- RIGHT SIDE: Actions (Search, Account, Shopping Bag) -->
+                <div class="flex items-center justify-end gap-3 sm:gap-4 shrink-0">
+                    
+                    <!-- Search Icon Button -->
+                    <button type="button" id="search-toggle-btn" onclick="toggleSearchOverlay()" class="rounded-full p-2.5 text-neutral-700 transition hover:bg-neutral-100 hover:text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400" title="Search Apparel" aria-label="Search" aria-controls="search-overlay" aria-expanded="false">
+                        <svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
+                        </svg>
+                    </button>
+
+                    <!-- User Account / Profile -->
+                    <div class="relative group">
+                        <a href="<?= isset($_SESSION['user_id']) ? '/account' : '/login'; ?>" class="flex items-center rounded-full p-2.5 text-neutral-700 transition hover:bg-neutral-100 hover:text-black" title="My Account" aria-label="Account">
+                            <svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+                            </svg>
+                        </a>
+
+                        <?php if (isset($_SESSION['user_id'])): ?>
+                            <!-- Logged In User Dropdown -->
+                            <div class="absolute right-0 top-full mt-2 w-52 rounded-2xl border border-neutral-200 bg-white/95 p-2.5 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200 z-50">
+                                <div class="px-3 py-2 border-b border-neutral-100">
+                                    <p class="text-[10px] uppercase font-bold tracking-wider text-neutral-500">Signed in as</p>
+                                    <p class="text-xs font-bold text-neutral-900 truncate"><?= htmlspecialchars($display_name, ENT_QUOTES, 'UTF-8'); ?></p>
+                                </div>
+                                <div class="space-y-1 mt-1.5">
+                                    <a href="/account" class="block px-3 py-2 text-xs font-medium text-neutral-700 hover:text-black hover:bg-neutral-100 rounded-xl transition">My Orders & Profile</a>
+                                    <?php if (in_array($_SESSION['user_role'] ?? '', ['admin', 'shop_admin'])): ?>
+                                        <a href="/admin" class="block px-3 py-2 text-xs font-bold text-neutral-900 hover:bg-neutral-100 rounded-xl transition">Admin Dashboard</a>
+                                    <?php endif; ?>
+                                    <a href="/logout" class="block px-3 py-2 text-xs font-bold text-rose-400 hover:bg-rose-950/40 rounded-xl transition">Sign Out</a>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Shopping Bag Icon (Carnage Style Minimalist Bag) -->
+                    <a href="/cart" class="relative flex items-center rounded-full p-2.5 text-neutral-700 transition hover:bg-neutral-100 hover:text-black group" title="Shopping Bag" aria-label="Cart">
+                        <svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
+                        </svg>
+                        <!-- Badge Counter -->
+                        <span id="cart-badge-desktop" class="<?= $cart_count > 0 ? 'flex' : 'hidden'; ?> absolute top-0 right-0 bg-black text-white text-[9px] font-black min-w-[1rem] h-[1rem] px-1 rounded-full items-center justify-center shadow-sm">
+                            <?= $cart_count; ?>
+                        </span>
+                        <span id="cart-total-desktop" class="hidden"><?= number_format($cart_total, 2); ?></span>
+                    </a>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- SLIDE-DOWN SEARCH BAR OVERLAY (DARK GLASS) -->
+        <!-- ========================================================================= -->
+        <div id="search-overlay" class="hidden border-t border-neutral-100 bg-white/95 px-4 py-4 shadow-lg backdrop-blur-xl sm:px-8 transition-all">
+            <div class="max-w-3xl mx-auto">
+                <form action="/shop" method="GET" class="relative flex items-center">
+                    <input 
+                        type="text" 
+                        name="search" 
+                        id="search-input"
+                        placeholder="Search suits, tailored blazers, oxford shirts, chinos, polos..." 
+                        class="w-full pl-12 pr-12 py-3.5 bg-neutral-50 border border-neutral-200 rounded-2xl text-xs sm:text-sm text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-neutral-400 focus:ring-2 focus:ring-neutral-900/5 font-medium transition"
+                    >
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-neutral-500">
+                        <svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+                    </span>
+                    <button type="button" onclick="toggleSearchOverlay()" class="absolute inset-y-0 right-0 flex items-center pr-4 text-neutral-500 hover:text-black transition">
+                        <svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </form>
+
+                <div class="flex items-center gap-2 mt-3 text-[11px] text-neutral-500 overflow-x-auto pb-1">
+                    <span class="font-bold uppercase tracking-wider text-neutral-500 shrink-0">Popular:</span>
+                    <a href="/shop?search=Shirt" class="px-2.5 py-1 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-900 hover:text-white transition shrink-0 font-medium">Oxford Shirts</a>
+                    <a href="/shop?search=Chino" class="px-2.5 py-1 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-900 hover:text-white transition shrink-0 font-medium">Stretch Chinos</a>
+                    <a href="/shop?search=Blazer" class="px-2.5 py-1 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-900 hover:text-white transition shrink-0 font-medium">Tailored Blazers</a>
+                    <a href="/shop?search=Polo" class="px-2.5 py-1 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-900 hover:text-white transition shrink-0 font-medium">Pique Polos</a>
                 </div>
             </div>
+        </div>
+    </header>
+
+    <!-- ========================================================================= -->
+    <!-- 2. MOBILE SLIDE-OUT DRAWER (4MEN LUXURY APPAREL) -->
+    <!-- ========================================================================= -->
+    <div id="drawer-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[998] opacity-0 pointer-events-none transition-opacity duration-300 ease-in-out"></div>
+
+    <aside id="main-drawer" class="fixed top-0 left-0 h-full w-[320px] sm:w-[380px] bg-white dark:bg-neutral-900 z-[999] shadow-2xl transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col overflow-hidden border-r border-neutral-200 dark:border-neutral-800">
+        
+        <!-- Drawer Header -->
+        <div class="p-5 border-b border-neutral-100 dark:border-neutral-800 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-black text-white dark:bg-white dark:text-black flex items-center justify-center font-black text-xs shadow-md tracking-tight">
+                    4M
+                </div>
+                <div class="flex flex-col leading-tight">
+                    <span class="text-base font-black tracking-wider text-neutral-900 dark:text-white uppercase">4MEN</span>
+                    <span class="text-[9px] font-bold tracking-[0.25em] text-neutral-500 uppercase">COLLECTION</span>
+                </div>
+            </a>
             
-            <button type="button" id="drawer-close-btn" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-rose-50 hover:text-rose-600 flex items-center justify-center transition focus:outline-none">
+            <button type="button" id="drawer-close-btn" class="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-500 hover:text-black dark:hover:text-white flex items-center justify-center transition focus:outline-none">
                 <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
 
         <!-- Drawer Content -->
-        <div class="flex-1 overflow-y-auto drawer-scrollbar p-4 sm:p-5 space-y-6">
+        <div class="flex-1 overflow-y-auto drawer-scrollbar p-5 space-y-6">
             
-            <div>
-                <div class="space-y-1.5">
-                    
-                    <!-- All Books Link -->
-                    <a href="/shop" class="flex items-center justify-between p-3 rounded-xl hover:bg-sky-50 text-slate-800 hover:text-sky-700 font-bold text-xs sm:text-sm transition group border border-slate-100">
-                        <span class="flex items-center gap-3">
-                            <span class="w-2 h-2 rounded-full bg-sky-700"></span>
-                            <span>Browse All Books (Shop)</span>
-                        </span>
-                        <span class="text-[10px] bg-sky-100 text-sky-800 font-black px-2 py-0.5 rounded-md">ALL</span>
-                    </a>
-
-                    <!-- Category Items with Sub-Category Dropdown / Expand -->
-                    <?php if (!empty($category_tree)): ?>
-                        <?php foreach ($category_tree as $cat_id => $parent_cat): 
-                            $has_children = !empty($parent_cat['children']);
-                            $cat_img = !empty($parent_cat['image']) 
-                                ? ((str_starts_with($parent_cat['image'], 'http://') || str_starts_with($parent_cat['image'], 'https://')) ? $parent_cat['image'] : '/' . ltrim(htmlspecialchars($parent_cat['image']), '/')) 
-                                : null;
-                        ?>
-                            <div class="border border-slate-100 rounded-xl overflow-hidden bg-white hover:border-slate-300 transition-colors">
-                                <div class="flex items-center justify-between p-2.5 sm:p-3">
-                                    <a href="/category/<?= htmlspecialchars($parent_cat['slug']) ?>" class="flex items-center gap-3 text-slate-800 hover:text-sky-700 font-bold text-xs sm:text-sm flex-1 min-w-0">
-                                        <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center shrink-0 overflow-hidden border border-slate-200">
-                                            <?php if ($cat_img): ?>
-                                                <img src="<?= $cat_img; ?>" alt="<?= htmlspecialchars($parent_cat['name']) ?>" class="w-full h-full object-cover">
-                                            <?php else: ?>
-                                                <svg class="w-4 h-4 text-sky-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                                            <?php endif; ?>
-                                        </div>
-                                        <span class="truncate"><?= htmlspecialchars($parent_cat['name']) ?></span>
-                                    </a>
-
-                                    <?php if ($has_children): ?>
-                                        <button type="button" onclick="toggleSubCategory('sub-cat-<?= $cat_id ?>', this)" class="p-1.5 text-slate-400 hover:text-sky-700 hover:bg-slate-100 rounded-lg transition" title="Toggle Sub-categories">
-                                            <svg class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                                        </button>
-                                    <?php else: ?>
-                                        <a href="/category/<?= htmlspecialchars($parent_cat['slug']) ?>" class="text-slate-300 hover:text-sky-700 p-1">
-                                            <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-                                        </a>
-                                    <?php endif; ?>
-                                </div>
-
-                                <!-- Sub-Categories Accordion Body -->
-                                <?php if ($has_children): ?>
-                                    <div id="sub-cat-<?= $cat_id ?>" class="hidden bg-slate-50/80 border-t border-slate-100 px-3 py-2 space-y-1">
-                                        <?php foreach ($parent_cat['children'] as $child): ?>
-                                            <a href="/category/<?= htmlspecialchars($child['slug']) ?>" class="flex items-center justify-between py-1.5 px-3 rounded-lg text-xs font-semibold text-slate-600 hover:text-sky-700 hover:bg-white transition">
-                                                <span class="flex items-center gap-2">
-                                                    <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
-                                                    <?= htmlspecialchars($child['name']) ?>
-                                                </span>
-                                                <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                                            </a>
-                                        <?php endforeach; ?>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-
+            <!-- Quick Mobile Search -->
+            <form action="/shop" method="GET">
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        name="search" 
+                        placeholder="Search 4MEN Collection..." 
+                        class="w-full pl-10 pr-4 py-2.5 bg-neutral-100 dark:bg-neutral-800 rounded-xl text-xs text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-black/10 font-medium"
+                    >
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-neutral-400">
+                        <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+                    </span>
                 </div>
-            </div>
+            </form>
 
-            <!-- Quick Navigation Menu -->
-            <div class="border-t border-slate-100 pt-5">
-                <p class="text-[11px] font-bold tracking-widest text-slate-400 uppercase mb-3">Quick Links</p>
+            <!-- Primary Nav Links -->
+            <div>
+                <p class="text-[10px] font-bold tracking-[0.22em] text-neutral-400 uppercase mb-2.5">Menu</p>
                 <div class="space-y-1">
-                    <a href="/" class="flex items-center gap-3 p-2.5 rounded-xl text-xs sm:text-sm font-semibold transition <?= ($current_uri === '/' || $current_uri === '/home') ? 'bg-sky-50 text-sky-700' : 'text-slate-700 hover:bg-slate-50 hover:text-sky-700' ?>">
-                        <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+                    <a href="/" class="flex items-center justify-between p-2.5 rounded-xl text-xs font-bold text-neutral-900 dark:text-white hover:bg-neutral-50 dark:hover:bg-neutral-800 transition">
                         <span>Home</span>
                     </a>
-                    <a href="/authors" class="flex items-center gap-3 p-2.5 rounded-xl text-xs sm:text-sm font-semibold transition <?= (strpos($current_uri, '/authors') !== false) ? 'bg-sky-50 text-sky-700' : 'text-slate-700 hover:bg-slate-50 hover:text-sky-700' ?>">
-                        <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
-                        <span>Authors & Writers</span>
+                    <a href="/shop" class="flex items-center justify-between p-2.5 rounded-xl text-xs font-bold text-neutral-900 dark:text-white hover:bg-neutral-50 dark:hover:bg-neutral-800 transition">
+                        <span>Shop All</span>
+                        <span class="text-[9px] bg-black text-white dark:bg-white dark:text-black px-1.5 py-0.5 rounded font-black">ALL</span>
                     </a>
-                    <a href="/publishers" class="flex items-center gap-3 p-2.5 rounded-xl text-xs sm:text-sm font-semibold transition <?= (strpos($current_uri, '/publishers') !== false) ? 'bg-sky-50 text-sky-700' : 'text-slate-700 hover:bg-slate-50 hover:text-sky-700' ?>">
-                        <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                        <span>Publishers</span>
+                    <a href="/shop?filter=new" class="flex items-center justify-between p-2.5 rounded-xl text-xs font-bold text-neutral-900 dark:text-white hover:bg-neutral-50 dark:hover:bg-neutral-800 transition">
+                        <span class="whitespace-nowrap">New Arrivals</span>
+                        <span class="text-[9px] bg-emerald-600 text-white px-1.5 py-0.5 rounded font-bold shrink-0">HOT</span>
                     </a>
-                    <a href="/shop?stock=sale" class="flex items-center gap-3 p-2.5 rounded-xl text-xs sm:text-sm font-semibold text-rose-600 hover:bg-rose-50 transition">
-                        <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z"/></svg>
-                        <span>Special Offers & Discounts</span>
+                    <a href="/about" class="flex items-center justify-between p-2.5 rounded-xl text-xs font-bold text-neutral-900 dark:text-white hover:bg-neutral-50 dark:hover:bg-neutral-800 transition">
+                        <span class="whitespace-nowrap">About Us</span>
                     </a>
-                    <a href="/blog" class="flex items-center gap-3 p-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-sky-700 transition <?= (strpos($current_uri, '/blog') !== false) ? 'bg-sky-50 text-sky-700' : '' ?>">
-                        <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
-                        <span>Literary Blog & Reviews</span>
-                    </a>
-                    <a href="/contact" class="flex items-center gap-3 p-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-sky-700 transition <?= (strpos($current_uri, '/contact') !== false) ? 'bg-sky-50 text-sky-700' : '' ?>">
-                        <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
-                        <span>Contact ReadersHub</span>
+                    <a href="/contact" class="flex items-center justify-between p-2.5 rounded-xl text-xs font-bold text-neutral-900 dark:text-white hover:bg-neutral-50 dark:hover:bg-neutral-800 transition">
+                        <span>Contact & Inquiries</span>
                     </a>
                 </div>
             </div>
 
-            <!-- Need Help Box -->
-            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-1.5 text-xs text-slate-600">
-                <div class="font-bold text-slate-900 flex items-center gap-2">
-                    <svg class="w-4 h-4 text-sky-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-                    Need Help? Hotline
+            <!-- Categories Accordion Section -->
+            <?php if (!empty($category_tree)): ?>
+            <div class="border-t border-neutral-100 dark:border-neutral-800 pt-5">
+                <p class="text-[10px] font-bold tracking-[0.22em] text-neutral-400 uppercase mb-2.5">Categories</p>
+                <div class="space-y-1.5">
+                    <?php foreach ($category_tree as $cat_id => $parent_cat): 
+                        $has_children = !empty($parent_cat['children']);
+                    ?>
+                        <div class="border border-neutral-100 dark:border-neutral-800 rounded-xl overflow-hidden bg-neutral-50/50 dark:bg-neutral-800/40">
+                            <div class="flex items-center justify-between p-2.5">
+                                <a href="/category/<?= htmlspecialchars($parent_cat['slug']) ?>" class="text-xs font-bold text-neutral-800 dark:text-neutral-200 hover:text-black dark:hover:text-white flex-1 truncate">
+                                    <?= htmlspecialchars($parent_cat['name']) ?>
+                                </a>
+
+                                <?php if ($has_children): ?>
+                                    <button type="button" onclick="toggleSubCategory('sub-cat-<?= $cat_id ?>', this)" class="p-1 text-neutral-400 hover:text-black dark:hover:text-white transition" title="Toggle Sub-categories">
+                                        <svg class="w-3.5 h-3.5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                    </button>
+                                <?php endif; ?>
+                            </div>
+
+                            <?php if ($has_children): ?>
+                                <div id="sub-cat-<?= $cat_id ?>" class="hidden bg-white dark:bg-neutral-900 border-t border-neutral-100 dark:border-neutral-800 px-3 py-2 space-y-1">
+                                    <?php foreach ($parent_cat['children'] as $child): ?>
+                                        <a href="/category/<?= htmlspecialchars($child['slug']) ?>" class="flex items-center justify-between py-1.5 px-2 rounded-lg text-xs font-medium text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white hover:bg-neutral-50 dark:hover:bg-neutral-800 transition">
+                                            <span><?= htmlspecialchars($child['name']) ?></span>
+                                            <svg class="w-3 h-3 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                        </a>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
-                <div class="font-semibold text-slate-800">+94 (77) 123-4567</div>
-                <div class="text-slate-500">support@readershub.lk</div>
+            </div>
+            <?php endif; ?>
+
+            <!-- Contact Box -->
+            <div class="bg-neutral-50 dark:bg-neutral-800/60 p-4 rounded-2xl border border-neutral-100 dark:border-neutral-800 space-y-1 text-xs">
+                <p class="font-bold text-neutral-900 dark:text-white">Customer Support</p>
+                <p class="text-neutral-500 font-medium">+94 (77) 123-4567</p>
+                <p class="text-neutral-500 font-medium">support@4mencollection.lk</p>
             </div>
         </div>
 
         <!-- Drawer Footer Account Bar -->
-        <div class="p-4 border-t border-slate-100 bg-white">
+        <div class="p-4 border-t border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-900">
             <?php if (isset($_SESSION['user_id'])): ?>
                 <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-full bg-sky-100 text-sky-800 font-bold flex items-center justify-center text-xs">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-full bg-black text-white dark:bg-white dark:text-black font-extrabold flex items-center justify-center text-xs">
                             <?= strtoupper(substr($display_name, 0, 1)); ?>
                         </div>
                         <div class="flex flex-col">
-                            <span class="text-[10px] text-slate-400 font-medium">Signed in</span>
-                            <span class="text-xs font-bold text-slate-900 leading-tight truncate max-w-[140px]"><?= htmlspecialchars($display_name, ENT_QUOTES, 'UTF-8'); ?></span>
+                            <span class="text-[9px] text-neutral-400 font-bold uppercase tracking-wider">Signed in</span>
+                            <span class="text-xs font-bold text-neutral-900 dark:text-white leading-tight truncate max-w-[140px]"><?= htmlspecialchars($display_name, ENT_QUOTES, 'UTF-8'); ?></span>
                         </div>
                     </div>
-                    <a href="/account" class="text-xs font-bold text-sky-700 hover:underline">Account</a>
+                    <a href="/account" class="text-xs font-bold text-neutral-900 dark:text-white hover:underline">My Account</a>
                 </div>
-                <a href="/logout" class="block text-center w-full py-2 text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition">Log Out</a>
+                <a href="/logout" class="block text-center w-full py-2.5 text-xs font-bold text-rose-600 bg-rose-50 dark:bg-rose-950/40 rounded-xl transition">Sign Out</a>
             <?php else: ?>
                 <div class="grid grid-cols-2 gap-2">
-                    <a href="/login" class="text-center py-2 text-xs font-bold text-slate-700 border border-slate-200 rounded-xl hover:bg-slate-50 transition">Sign In</a>
-                    <a href="/register" class="text-center py-2 text-xs font-bold text-white bg-sky-700 hover:bg-sky-800 rounded-xl transition shadow-xs">Register</a>
+                    <a href="/login" class="text-center py-2.5 text-xs font-bold text-neutral-900 dark:text-white border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800 transition">Sign In</a>
+                    <a href="/register" class="text-center py-2.5 text-xs font-bold text-white bg-black dark:bg-white dark:text-black hover:bg-neutral-800 rounded-xl transition">Register</a>
                 </div>
             <?php endif; ?>
         </div>
     </aside>
 
-    <!-- ==================== 2. TOP HEADER UTILITY BAR ==================== -->
-    <div class="border-b border-slate-800 bg-[#0f172a] text-xs text-slate-300 hidden md:block w-full">
-        <div class="w-full px-4 sm:px-6 lg:px-8 xl:px-12 flex justify-between items-center h-9">
-            <div class="flex items-center space-x-5 text-[11px]">
-                <a href="tel:+94771234567" class="hover:text-sky-400 transition flex items-center gap-1.5 font-medium">
-                    <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-                    <span>+94 (77) 123-4567</span>
-                </a>
-                <span class="text-slate-700">|</span>
-                <a href="mailto:info@readershub.lk" class="hover:text-sky-400 transition flex items-center gap-1.5 font-medium">
-                    <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                    <span>info@readershub.lk</span>
-                </a>
-                <span class="text-slate-700 hidden lg:inline">|</span>
-                <span class="hidden lg:inline text-slate-400">⚡ Islandwide Delivery Available</span>
-            </div>
-
-            <div class="flex items-center space-x-6 text-[11px] text-slate-300">
-                <a href="/authors" class="hover:text-sky-400 transition flex items-center gap-1 font-medium">
-                    <span>Authors</span>
-                </a>
-                <span class="text-slate-700">|</span>
-                <a href="/publishers" class="hover:text-sky-400 transition flex items-center gap-1 font-medium">
-                    <span>Publishers</span>
-                </a>
-                <span class="text-slate-700">|</span>
-                <a href="/shop" class="hover:text-sky-400 transition flex items-center gap-1 font-medium">
-                    <span>Shop Catalog</span>
-                </a>
-                <span class="text-slate-700">|</span>
-                <a href="/cart" class="hover:text-sky-400 transition flex items-center gap-1 font-medium">
-                    <span>Shopping Cart</span>
-                </a>
-                <span class="text-slate-700">|</span>
-                <a href="<?= isset($_SESSION['user_id']) ? '/account' : '/login'; ?>" class="hover:text-sky-400 transition flex items-center gap-1.5 font-medium text-slate-200">
-                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                    <?= isset($_SESSION['user_id']) ? htmlspecialchars($display_name, ENT_QUOTES, 'UTF-8') : 'My Account'; ?>
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- ==================== 3. MAIN STICKY NAVIGATION ==================== -->
-    <header class="bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs sticky top-0 z-50 w-full transition-all">
-        <div class="w-full px-4 sm:px-6 lg:px-8 xl:px-12">
-            <div class="flex items-center justify-between h-20 gap-4 lg:gap-8">
-                
-                <!-- Left: Logo & Categories Trigger Button -->
-                <div class="flex items-center gap-3 sm:gap-4 shrink-0">
-                    
-                    <!-- Mobile Hamburger Toggle Button -->
-                    <button type="button" class="universal-drawer-trigger lg:hidden p-2 text-slate-700 hover:text-sky-700 hover:bg-sky-50 rounded-xl transition focus:outline-none" aria-label="Open Mobile Menu">
-                        <svg class="w-6 h-6 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
-                    </button>
-
-                    <!-- Brand Logo -->
-                    <a href="/" class="flex items-center gap-2 group">
-                        <span class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center">
-                            Readers<span class="text-sky-700 font-black">Hub</span><span class="w-2 h-2 rounded-full bg-sky-600 ml-0.5 inline-block"></span>
-                        </span>
-                    </a>
-
-                    <!-- Desktop & Laptop "Categories" Trigger Button -->
-                    <button type="button" class="universal-drawer-trigger hidden lg:flex items-center gap-2.5 bg-sky-50 hover:bg-sky-700 text-sky-800 hover:text-white border border-sky-200 hover:border-sky-700 px-4 py-2.5 rounded-xl transition-all duration-200 font-bold text-xs tracking-wider uppercase ml-2 shadow-xs group">
-                        <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
-                        <span>Categories</span>
-                    </button>
-                </div>
-
-                <!-- Middle: Extended Search Bar -->
-                <div class="hidden md:flex flex-1 max-w-xl mx-4">
-                    <form action="/shop" method="GET" class="w-full">
-                        <div class="flex items-center rounded-full border-2 border-slate-200 hover:border-sky-700 focus-within:border-sky-700 bg-white transition duration-200 shadow-xs overflow-hidden p-0.5">
-                            <input 
-                                type="text" 
-                                name="search" 
-                                placeholder="Search by title, author, or ISBN..." 
-                                class="w-full bg-transparent text-xs sm:text-sm text-slate-800 pl-5 pr-3 py-2 outline-none"
-                            >
-                            <button type="submit" class="bg-sky-700 hover:bg-sky-800 text-white w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition shadow-sm ml-1" aria-label="Search">
-                                <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Center/Right Desktop Navigation Links -->
-                <nav class="hidden lg:flex items-center space-x-7 text-sm font-semibold shrink-0">
-                    <a href="/" class="text-slate-800 hover:text-sky-700 transition <?= ($current_uri === '/' || $current_uri === '/home') ? 'text-sky-700 font-bold' : '' ?>">Home</a>
-                    <a href="/shop" class="text-slate-800 hover:text-sky-700 transition <?= (strpos($current_uri, '/shop') !== false) ? 'text-sky-700 font-bold' : '' ?>">Shop</a>
-                    <a href="/authors" class="text-slate-800 hover:text-sky-700 transition <?= (strpos($current_uri, '/authors') !== false) ? 'text-sky-700 font-bold' : '' ?>">Authors</a>
-                    <a href="/publishers" class="text-slate-800 hover:text-sky-700 transition <?= (strpos($current_uri, '/publishers') !== false) ? 'text-sky-700 font-bold' : '' ?>">Publishers</a>
-                    <a href="/contact" class="text-slate-800 hover:text-sky-700 transition <?= (strpos($current_uri, '/contact') !== false) ? 'text-sky-700 font-bold' : '' ?>">Contact Us</a>
-                </nav>
-
-                <!-- Right Action Icons (Wishlist, Account, Cart) -->
-                <div class="flex items-center space-x-3 sm:space-x-4 shrink-0">
-                    
-                    <a href="/account" class="relative hidden sm:inline-flex text-slate-700 hover:text-sky-700 transition p-2 rounded-xl hover:bg-slate-50" title="Wishlist">
-                        <svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-                    </a>
-
-                    <a href="<?= isset($_SESSION['user_id']) ? '/account' : '/login'; ?>" class="text-slate-700 hover:text-sky-700 transition p-2 rounded-xl hover:bg-slate-50" title="Account">
-                        <svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                    </a>
-
-                    <!-- Cart Indicator with Synchronized Live Amount -->
-                    <a href="/cart" class="flex items-center gap-2.5 text-slate-800 hover:text-sky-700 transition p-2 rounded-xl hover:bg-slate-50" title="Shopping Cart">
-                        <div class="relative">
-                            <svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
-                            <span id="cart-badge-desktop" class="<?= $cart_count > 0 ? 'flex' : 'hidden'; ?> absolute -top-1.5 -right-2 bg-rose-600 text-white text-[9px] font-black min-w-[1rem] h-[1rem] px-1 rounded-full items-center justify-center shadow">
-                                <?= $cart_count; ?>
-                            </span>
-                        </div>
-                        <span class="hidden sm:inline-block font-bold text-xs tracking-tight text-slate-900">
-                            Rs. <span id="cart-total-desktop"><?= number_format($cart_total, 2); ?></span>
-                        </span>
-                    </a>
-                </div>
-
-            </div>
-
-            <!-- Mobile Search Bar Below Header -->
-            <div class="md:hidden pb-3">
-                <form action="/shop" method="GET" class="w-full">
-                    <div class="flex items-center rounded-full border border-slate-300 bg-white shadow-xs overflow-hidden p-0.5">
-                        <input 
-                            type="text" 
-                            name="search" 
-                            placeholder="Search books, authors..." 
-                            class="w-full bg-transparent text-xs text-slate-800 pl-4 pr-2 py-2 outline-none"
-                        >
-                        <button type="submit" class="bg-sky-700 text-white w-8 h-8 rounded-full flex items-center justify-center shrink-0">
-                            <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </header>
-
-    <!-- ==================== 4. SIDEBAR & ACCORDION JAVASCRIPT ==================== -->
+    <!-- ========================================================================= -->
+    <!-- 3. NAVIGATION JAVASCRIPT & CART SYNC -->
+    <!-- ========================================================================= -->
     <script>
+        // Keep the glass header readable as the page moves beneath it.
+        function updateNavbarOnScroll() {
+            const navbar = document.getElementById('main-navbar');
+            if (!navbar) return;
+            if (window.scrollY > 20) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        }
+        window.addEventListener('scroll', updateNavbarOnScroll, { passive: true });
+        updateNavbarOnScroll();
+
+        // Search Overlay Toggle
+        function toggleSearchOverlay() {
+            const overlay = document.getElementById('search-overlay');
+            const input = document.getElementById('search-input');
+            const toggle = document.getElementById('search-toggle-btn');
+            if (!overlay) return;
+
+            const isOpening = overlay.classList.contains('hidden');
+            overlay.classList.toggle('hidden', !isOpening);
+            if (toggle) toggle.setAttribute('aria-expanded', String(isOpening));
+
+            if (isOpening) {
+                if (input) setTimeout(() => input.focus(), 50);
+            }
+        }
+
+        // Mobile Drawer Toggle
         document.addEventListener("DOMContentLoaded", function () {
-            const triggers = document.querySelectorAll('.universal-drawer-trigger');
             const closeBtn = document.getElementById('drawer-close-btn');
             const drawer = document.getElementById('main-drawer');
             const overlay = document.getElementById('drawer-overlay');
+            const drawerTriggers = document.querySelectorAll('.universal-drawer-trigger');
 
             function openDrawer() {
                 if (!drawer || !overlay) return;
@@ -573,6 +607,7 @@ $current_uri = $_SERVER['REQUEST_URI'] ?? '/';
                 overlay.classList.remove('opacity-0', 'pointer-events-none');
                 overlay.classList.add('opacity-100');
                 document.body.classList.add('overflow-hidden');
+                drawerTriggers.forEach(btn => btn.setAttribute('aria-expanded', 'true'));
             }
 
             function closeDrawer() {
@@ -581,20 +616,28 @@ $current_uri = $_SERVER['REQUEST_URI'] ?? '/';
                 overlay.classList.remove('opacity-100');
                 overlay.classList.add('opacity-0', 'pointer-events-none');
                 document.body.classList.remove('overflow-hidden');
+                drawerTriggers.forEach(btn => btn.setAttribute('aria-expanded', 'false'));
             }
 
-            triggers.forEach(btn => btn.addEventListener('click', openDrawer));
+            drawerTriggers.forEach(btn => btn.addEventListener('click', openDrawer));
             if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
             if (overlay) overlay.addEventListener('click', closeDrawer);
 
             document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape' && drawer && !drawer.classList.contains('-translate-x-full')) {
-                    closeDrawer();
+                if (e.key === 'Escape') {
+                    if (drawer && !drawer.classList.contains('-translate-x-full')) {
+                        closeDrawer();
+                    }
+                    const searchOverlay = document.getElementById('search-overlay');
+                    if (searchOverlay && !searchOverlay.classList.contains('hidden')) {
+                        searchOverlay.classList.add('hidden');
+                        document.getElementById('search-toggle-btn')?.setAttribute('aria-expanded', 'false');
+                    }
                 }
             });
         });
 
-        // Sub-category accordion expand/collapse
+        // Sub-category Accordion
         function toggleSubCategory(id, btn) {
             const container = document.getElementById(id);
             if (!container) return;
@@ -609,7 +652,7 @@ $current_uri = $_SERVER['REQUEST_URI'] ?? '/';
             }
         }
 
-        // Global Cart Counter & Subtotal Handler (Parses Numbers and Formats with Commas)
+        // Global Cart Counter & Subtotal Handler
         function updateCartBadgeGlobal(quantity, total = null, priceDelta = null) {
             const deskBadge = document.getElementById('cart-badge-desktop');
             const deskTotal = document.getElementById('cart-total-desktop');
@@ -650,4 +693,5 @@ $current_uri = $_SERVER['REQUEST_URI'] ?? '/';
         });
     </script>
 
+    <!-- Main Content Container Open -->
     <main class="flex-1 w-full">

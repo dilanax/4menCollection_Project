@@ -219,26 +219,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 }
 ?>
 
-<script>document.title = "Create New Password | ReadersHub";</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script>document.title = "Create New Password | 4MEN COLLECTION";</script>
 
-<div class="min-h-[80vh] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[#f8fafc]" style="font-family: 'Poppins', sans-serif;">
+<div class="min-h-[80vh] flex flex-col justify-center py-12 sm:py-16 px-4 sm:px-6 lg:px-8 relative selection:bg-black selection:text-white" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+    
+    <div class="absolute inset-0 pointer-events-none overflow-hidden -z-10">
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-neutral-100 dark:bg-neutral-800/20 rounded-full blur-3xl opacity-70"></div>
+    </div>
+
     <div class="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <div class="w-12 h-12 bg-sky-50 text-sky-700 border border-sky-200 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-xs">
-            <svg class="w-6 h-6 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
-        </div>
-        <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+        <!-- 4MEN COLLECTION Admin-Style Monochrome Logo -->
+        <a href="/" class="inline-flex items-center gap-3.5 group mb-6 transition-transform duration-200 hover:scale-[1.02]">
+            <div class="w-12 h-12 rounded-2xl bg-black text-white flex items-center justify-center font-black text-base shadow-lg shadow-black/15 shrink-0 tracking-tight border border-black group-hover:bg-neutral-900 transition-colors">
+                4M
+            </div>
+            <div class="flex flex-col text-left leading-tight">
+                <span class="text-xl font-black tracking-wider text-neutral-900 dark:text-white uppercase">4MEN</span>
+                <span class="text-[10px] font-bold tracking-[0.26em] text-neutral-500 uppercase mt-0.5">COLLECTION</span>
+            </div>
+        </a>
+
+        <h1 class="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white tracking-tight">
             Choose New Password
-        </h2>
-        <p class="mt-1 text-xs sm:text-sm text-slate-500 font-medium">
+        </h1>
+        <p class="mt-2 text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 font-medium">
             <?= $token_valid ? "Enter your new password of at least 8 characters." : "Unable to proceed with reset."; ?>
         </p>
     </div>
 
-    <div class="mt-6 sm:mx-auto sm:w-full sm:max-w-md">
-        <div class="bg-white py-8 px-6 sm:px-10 rounded-3xl border border-slate-200/90 shadow-sm">
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="bg-white dark:bg-neutral-900 py-9 px-6 sm:px-10 rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-xl shadow-neutral-900/5">
             
             <?php if ($message): ?>
-                <div class="mb-5 p-3.5 rounded-xl text-xs font-semibold flex items-center gap-2.5 <?= $messageType === 'success' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-rose-50 text-rose-800 border border-rose-200'; ?>">
+                <div class="mb-6 p-4 rounded-2xl text-xs sm:text-sm font-semibold flex items-center gap-3 <?= $messageType === 'success' ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800/60' : 'bg-rose-50 dark:bg-rose-950/40 text-rose-900 dark:text-rose-200 border border-rose-200 dark:border-rose-800/60'; ?>">
+                    <svg class="w-5 h-5 flex-shrink-0 <?= $messageType === 'success' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'; ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="<?= $messageType === 'success' ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' : 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'; ?>"/>
+                    </svg>
                     <span><?= htmlspecialchars($message); ?></span>
                 </div>
             <?php endif; ?>
@@ -250,52 +269,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     <input type="hidden" name="user_id" value="<?= (int)$user_id; ?>">
 
                     <div>
-                        <label for="new_password" class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5">
+                        <label for="new_password" class="block text-[11px] font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider mb-2">
                             New Password
                         </label>
-                        <input 
-                            id="new_password" 
-                            name="new_password" 
-                            type="password" 
-                            required 
-                            minlength="8" 
-                            placeholder="At least 8 characters"
-                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:bg-white focus:border-sky-700 outline-none transition"
-                        >
+                        <div class="relative">
+                            <input 
+                                id="new_password" 
+                                name="new_password" 
+                                type="password" 
+                                required 
+                                minlength="8" 
+                                placeholder="At least 8 characters"
+                                class="w-full pl-11 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700/80 rounded-2xl text-xs sm:text-sm text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 focus:bg-white dark:focus:bg-neutral-900 focus:border-black dark:focus:border-white focus:ring-4 focus:ring-neutral-900/5 dark:focus:ring-white/5 outline-none transition font-medium"
+                            >
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-neutral-400 dark:text-neutral-500">
+                                <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                </svg>
+                            </span>
+                        </div>
                     </div>
 
                     <div>
-                        <label for="confirm_password" class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5">
+                        <label for="confirm_password" class="block text-[11px] font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider mb-2">
                             Confirm New Password
                         </label>
-                        <input 
-                            id="confirm_password" 
-                            name="confirm_password" 
-                            type="password" 
-                            required 
-                            minlength="8" 
-                            placeholder="Re-enter password"
-                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:bg-white focus:border-sky-700 outline-none transition"
-                        >
+                        <div class="relative">
+                            <input 
+                                id="confirm_password" 
+                                name="confirm_password" 
+                                type="password" 
+                                required 
+                                minlength="8" 
+                                placeholder="Re-enter password"
+                                class="w-full pl-11 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700/80 rounded-2xl text-xs sm:text-sm text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 focus:bg-white dark:focus:bg-neutral-900 focus:border-black dark:focus:border-white focus:ring-4 focus:ring-neutral-900/5 dark:focus:ring-white/5 outline-none transition font-medium"
+                            >
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-neutral-400 dark:text-neutral-500">
+                                <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                </svg>
+                            </span>
+                        </div>
                     </div>
 
-                    <button 
-                        type="submit" 
-                        class="w-full flex justify-center py-3.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-sky-700 hover:bg-sky-800 transition shadow-md shadow-sky-700/20 active:scale-98"
-                    >
-                        Save & Update Password
-                    </button>
+                    <div class="pt-2">
+                        <button 
+                            type="submit" 
+                            class="w-full py-4 px-5 rounded-2xl text-xs sm:text-sm font-extrabold uppercase tracking-wider text-white bg-black hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 transition shadow-lg shadow-black/15 hover:shadow-xl active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
+                        >
+                            <span>Save & Update Password</span>
+                            <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                            </svg>
+                        </button>
+                    </div>
                 </form>
             <?php else: ?>
-                <div class="text-center">
-                    <a href="/forgot-password" class="inline-block w-full py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider text-sky-700 bg-sky-50 hover:bg-sky-100 transition border border-sky-200">
+                <div class="text-center py-2">
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-5">This password reset link is invalid or has expired.</p>
+                    <a href="/forgot-password" class="inline-block w-full py-3.5 px-4 rounded-2xl text-xs font-bold uppercase tracking-wider text-white bg-black hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 transition shadow-md">
                         Request New Reset Link
                     </a>
                 </div>
             <?php endif; ?>
 
-            <div class="mt-6 text-center pt-4 border-t border-slate-100">
-                <a href="/login" class="text-xs font-bold text-slate-500 hover:text-sky-700 transition inline-flex items-center gap-1">
+            <div class="mt-7 text-center pt-6 border-t border-neutral-100 dark:border-neutral-800">
+                <a href="/login" class="text-xs font-bold text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white transition inline-flex items-center gap-1.5 hover:underline">
                     <span>&larr; Return to Sign In</span>
                 </a>
             </div>

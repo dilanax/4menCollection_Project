@@ -9,7 +9,7 @@ if (!isset($pdo) || !($pdo instanceof PDO)) {
 }
 
 
-// Fetch Top 6 Trending / Best-selling Books by Order Count
+// Fetch the top six trending products by order count
 $trending_products = [];
 try {
     if (isset($pdo) && $pdo instanceof PDO) {
@@ -37,7 +37,7 @@ try {
     $trending_products = [];
 }
 
-// Fallback: Orders කිසිවක් නැති විට සාමාන්‍යයෙන් පොත් 6ක් පෙන්වීම සඳහා
+// Show the latest products when there are no recorded orders yet.
 if (empty($trending_products) && isset($pdo) && $pdo instanceof PDO) {
     try {
         $stmt_fb = $pdo->query("SELECT p.*, b.name as brand_name FROM products p LEFT JOIN brands b ON p.brand_id = b.id WHERE (p.status IS NULL OR p.status = '' OR p.status IN ('published', 'publish', 'active', '1', 'enabled') OR p.status != 'draft') ORDER BY p.id DESC LIMIT 6");
@@ -49,7 +49,7 @@ if (empty($trending_products) && isset($pdo) && $pdo instanceof PDO) {
 
 
 
-// 1. Fetch Dynamic Categories with Book Counts (Only using categories & product_categories)
+// 1. Fetch dynamic product categories.
 $featured_categories = [];
 try {
     if (isset($pdo) && $pdo instanceof PDO) {
@@ -60,10 +60,10 @@ try {
                          JOIN products p ON pc.product_id = p.id
                          WHERE (pc.category_id = c.id OR pc.category_id IN (SELECT sub.id FROM categories sub WHERE sub.parent_id = c.id))
                          AND (p.status IS NULL OR p.status = '' OR p.status IN ('published', 'publish', 'active', '1', 'enabled') OR p.status != 'draft')
-                     ) as book_count 
+                     ) as product_count
                      FROM categories c 
                      WHERE c.slug NOT IN ('vinura-ransika', 'vinura_ransika') 
-                     ORDER BY book_count DESC, c.id ASC 
+                     ORDER BY product_count DESC, c.id ASC
                      LIMIT 12";
         $stmt_cats = $pdo->query($sql_cats);
         if ($stmt_cats) {
@@ -72,7 +72,7 @@ try {
     }
 } catch (Throwable $e) {
     try {
-        $sql_cats = "SELECT c.*, COUNT(pc.product_id) as book_count 
+        $sql_cats = "SELECT c.*, COUNT(pc.product_id) as product_count
                      FROM categories c 
                      LEFT JOIN product_categories pc ON c.id = pc.category_id 
                      WHERE c.slug NOT IN ('vinura-ransika', 'vinura_ransika') 
@@ -88,7 +88,7 @@ try {
     }
 }
 
-// 2. Fetch Latest 12 Books for Featured Section (With Exact Category Name & Slug)
+// 2. Fetch the latest products for the featured section.
 $featured_products = [];
 try {
     if (isset($pdo) && $pdo instanceof PDO) {
@@ -113,7 +113,7 @@ try {
     $featured_products = [];
 }
 
-// 3. Fetch Category-wise Books (Matches Category & its Sub-categories without non-existent columns)
+// 3. Fetch products by category, including child categories.
 $category_books = [];
 if (!empty($featured_categories) && isset($pdo) && $pdo instanceof PDO) {
     foreach ($featured_categories as $cat) {
@@ -173,17 +173,17 @@ if (!empty($featured_categories) && isset($pdo) && $pdo instanceof PDO) {
     }
 }
 
-// 4. Fetch Top 12 Publishers (Brands) with Book Counts
+// 4. Fetch top brands by product count.
 $featured_publishers = [];
 try {
     if (isset($pdo) && $pdo instanceof PDO) {
         $sql_pubs = "SELECT b.id, b.name, b.slug, b.image, 
-                     COUNT(p.id) as book_count 
+                     COUNT(p.id) as product_count
                      FROM brands b 
                      LEFT JOIN products p ON b.id = p.brand_id 
                           AND (p.status IS NULL OR p.status = '' OR p.status IN ('published', 'publish', 'active', '1', 'enabled') OR p.status != 'draft')
                      GROUP BY b.id 
-                     ORDER BY book_count DESC, b.name ASC 
+                     ORDER BY product_count DESC, b.name ASC
                      LIMIT 12";
         $stmt_pubs = $pdo->query($sql_pubs);
         if ($stmt_pubs) {
@@ -194,42 +194,7 @@ try {
     $featured_publishers = [];
 }
 
-// 5. Fetch Top 12 Authors from 'attributes' and 'attribute_terms'
-$featured_authors = [];
-try {
-    if (isset($pdo) && $pdo instanceof PDO) {
-        $sql_authors = "SELECT t.id, t.name, t.slug,
-                        (
-                            SELECT COUNT(*) FROM product_attributes pa 
-                            JOIN products p ON pa.product_id = p.id
-                            WHERE pa.attribute_id = t.attribute_id 
-                            AND (pa.terms_json LIKE CONCAT('%\"', t.name, '\"%') OR pa.terms_json LIKE CONCAT('%', t.name, '%') OR pa.terms_json LIKE CONCAT('%', t.slug, '%'))
-                            AND (p.status IS NULL OR p.status = '' OR p.status IN ('published', 'publish', 'active', '1', 'enabled') OR p.status != 'draft')
-                        ) as book_count
-                        FROM attribute_terms t
-                        JOIN attributes a ON t.attribute_id = a.id
-                        WHERE a.slug = 'author' OR LOWER(a.name) = 'author'
-                        ORDER BY book_count DESC, t.name ASC
-                        LIMIT 12";
-        $stmt_authors = $pdo->query($sql_authors);
-        if ($stmt_authors) {
-            $featured_authors = $stmt_authors->fetchAll(PDO::FETCH_ASSOC);
-        }
-    }
-} catch (Throwable $e) {
-    try {
-        if (isset($pdo) && $pdo instanceof PDO) {
-            $stmt_authors = $pdo->query("SELECT t.id, t.name, t.slug, 0 as book_count FROM attribute_terms t JOIN attributes a ON t.attribute_id = a.id WHERE a.slug = 'author' OR LOWER(a.name) = 'author' ORDER BY t.name ASC LIMIT 12");
-            if ($stmt_authors) {
-                $featured_authors = $stmt_authors->fetchAll(PDO::FETCH_ASSOC);
-            }
-        }
-    } catch (Throwable $e2) {
-        $featured_authors = [];
-    }
-}
-
-// 6. Fetch Dynamic Blog Posts
+// 5. Fetch dynamic editorial posts.
 $latest_posts = [];
 try {
     if (isset($pdo) && $pdo instanceof PDO) {
@@ -249,96 +214,134 @@ try {
 }
 ?>
 
-<!-- Google Fonts & Swiper.js Bundle -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-
 <style>
     .home-wrapper, .home-wrapper * {
-        font-family: 'Poppins', sans-serif !important;
-    }
-
-    .hero-swiper {
-        width: 100%;
-        position: relative;
-        overflow: hidden;
-    }
-    .hero-swiper .swiper-wrapper {
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: nowrap !important;
-        width: 100%;
-        height: 100%;
-    }
-    .hero-swiper .swiper-slide {
-        flex-shrink: 0 !important;
-        width: 100% !important;
-        height: 100%;
-    }
-
-    .hero-swiper .swiper-pagination-bullet {
-        background: #ffffff;
-        width: 9px;
-        height: 9px;
-        opacity: 0.6;
-        border-radius: 9999px !important;
-        transition: all 0.3s ease;
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
-    }
-    .hero-swiper .swiper-pagination-bullet-active {
-        background: #0369a1 !important;
-        width: 28px !important;
-        opacity: 1 !important;
+        font-family: Arial, Helvetica, sans-serif !important;
     }
 </style>
 
 <!-- Floating Toast Container -->
 <div id="toast-container" class="fixed top-24 right-5 z-[100] transform translate-x-full transition-all duration-300 opacity-0 hidden">
-    <div class="bg-white border-l-4 border-sky-700 shadow-2xl p-4 flex items-center gap-3.5 min-w-[300px] max-w-sm rounded-2xl border border-slate-200">
-        <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center shrink-0 border border-sky-200">
+    <div class="bg-white border-l-4 border-neutral-900 shadow-2xl p-4 flex items-center gap-3.5 min-w-[300px] max-w-sm rounded-2xl border border-neutral-200">
+        <div class="w-10 h-10 rounded-xl bg-neutral-100 text-neutral-900 flex items-center justify-center shrink-0 border border-neutral-200">
             <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
         </div>
         <div class="flex-1 min-w-0">
             <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">Added to Basket!</h4>
-            <p id="toast-msg" class="text-xs text-slate-500 font-medium truncate mt-0.5">Book added to your shopping cart.</p>
+            <p id="toast-msg" class="text-xs text-slate-500 font-medium truncate mt-0.5">Item added to your shopping bag.</p>
         </div>
     </div>
 </div>
 
-<div class="home-wrapper w-full p-0 m-0 bg-[#f8fafc] text-slate-800">
+<div class="home-wrapper w-full p-0 m-0 bg-[#f5f4f1] text-neutral-900">
 
     <!-- ==================== 1. HERO BANNER ==================== -->
-    <section class="w-full px-4 sm:px-6 lg:px-8 xl:px-12 pt-4 pb-2">
-        <div class="w-full overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-sm bg-slate-100">
-            <div class="swiper hero-swiper w-full aspect-[2300/960]">
-                <div class="swiper-wrapper">
-                    <div class="swiper-slide relative w-full h-full">
-                        <a href="/shop" class="block w-full h-full">
-                            <img src="uploads/web/slide2.webp" alt="ReadersHub Banner 1" class="w-full h-full object-cover object-center" loading="eager">
-                        </a>
-                    </div>
-                    <div class="swiper-slide relative w-full h-full">
-                        <a href="/shop?categories[]=academic" class="block w-full h-full">
-                            <img src="uploads/web/slide1.webp" alt="ReadersHub Banner 2" class="w-full h-full object-cover object-center" loading="lazy">
-                        </a>
-                    </div>
-                </div>
-                <div class="swiper-pagination !bottom-3 sm:!bottom-5 z-20"></div>
-                <div class="swiper-button-prev !hidden sm:!flex !w-10 !h-10 !rounded-full !bg-white/90 !text-slate-800 hover:!bg-sky-700 hover:!text-white border border-slate-200 shadow-md after:!text-xs transition-colors !left-4 sm:!left-6 z-20"></div>
-                <div class="swiper-button-next !hidden sm:!flex !w-10 !h-10 !rounded-full !bg-white/90 !text-slate-800 hover:!bg-sky-700 hover:!text-white border border-slate-200 shadow-md after:!text-xs transition-colors !right-4 sm:!right-6 z-20"></div>
-            </div>
+    <?php $hero_video_clips = ['/uploads/web/5.mp4', '/uploads/web/2.mp4', '/uploads/web/4.mp4']; ?>
+    <style>
+        #home-hero,
+        #home-hero * {
+            font-family: Arial, Helvetica, sans-serif !important;
+        }
+    </style>
+    <section id="home-hero" class="relative isolate flex min-h-[calc(100svh-140px)] w-full items-center overflow-hidden bg-neutral-950 text-white sm:min-h-[680px] lg:min-h-[600px] lg:max-h-[900px]">
+        <video
+            id="home-hero-video"
+            class="absolute inset-0 h-full w-full object-cover"
+            src="<?= htmlspecialchars($hero_video_clips[0], ENT_QUOTES, 'UTF-8'); ?>"
+            autoplay
+            muted
+            playsinline
+            preload="auto"
+            aria-hidden="true"
+        ></video>
+        <div class="absolute inset-0 bg-gradient-to-r from-black/75 via-black/40 to-black/10"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/10"></div>
+
+        <div class="absolute bottom-5 left-6 right-6 z-10 flex flex-col items-start gap-4 sm:bottom-7 sm:left-10 sm:right-10 sm:flex-row sm:items-end sm:justify-between lg:left-12 lg:right-12">
+            <p class="w-full text-[clamp(2.25rem,5vw,6rem)] font-black italic uppercase leading-[0.9] tracking-tight text-white drop-shadow-md sm:max-w-[78%]">
+                Own your everyday
+            </p>
+            <button id="hero-video-toggle" type="button" class="rounded-full border border-white/30 bg-black/25 px-3.5 py-2 text-[9px] font-bold uppercase tracking-[0.14em] text-white backdrop-blur-sm transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white" aria-label="Pause background video">
+                Pause video
+            </button>
         </div>
     </section>
 
+    <script>
+        (function () {
+            const video = document.getElementById('home-hero-video');
+            const toggle = document.getElementById('hero-video-toggle');
+            const clips = <?= json_encode($hero_video_clips, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+            if (!video || !toggle || clips.length < 1) return;
+
+            let currentClip = 0;
+            const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            function sizeHeroForViewport() {
+                const hero = document.getElementById('home-hero');
+                const navbar = document.getElementById('main-navbar');
+                if (!hero) return;
+                if (navbar) {
+                    navbar.style.marginBottom = '-' + navbar.offsetHeight + 'px';
+                }
+                if (window.matchMedia('(min-width: 1024px)').matches) {
+                    const heroTop = hero.getBoundingClientRect().top + window.scrollY;
+                    const availableHeight = window.innerHeight - Math.max(0, heroTop);
+                    hero.style.height = Math.min(900, Math.max(600, availableHeight)) + 'px';
+                } else {
+                    hero.style.height = '';
+                }
+            }
+
+            function updateToggleLabel() {
+                const isPlaying = !video.paused;
+                toggle.textContent = isPlaying ? 'Pause video' : 'Play video';
+                toggle.setAttribute('aria-label', isPlaying ? 'Pause background video' : 'Play background video');
+            }
+
+            video.addEventListener('ended', function () {
+                currentClip = (currentClip + 1) % clips.length;
+                video.src = clips[currentClip];
+                video.load();
+                video.play().catch(function (error) {
+                    console.warn('Hero video could not continue playing:', error);
+                    updateToggleLabel();
+                });
+            });
+            video.addEventListener('play', updateToggleLabel);
+            video.addEventListener('pause', updateToggleLabel);
+            video.addEventListener('error', function () {
+                console.error('Unable to load homepage hero video:', video.currentSrc);
+                toggle.textContent = 'Video unavailable';
+                toggle.disabled = true;
+            });
+
+            if (reducedMotion) {
+                video.pause();
+            }
+
+            toggle.addEventListener('click', function () {
+                if (video.paused) {
+                    video.play().catch(function (error) {
+                        console.error('Unable to play homepage hero video:', error);
+                    });
+                } else {
+                    video.pause();
+                }
+            });
+
+            sizeHeroForViewport();
+            window.addEventListener('resize', sizeHeroForViewport, { passive: true });
+            updateToggleLabel();
+        })();
+    </script>
+
     <!-- ==================== 2. TRUST RIBBON ==================== -->
-    <section class="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-6">
-        <div class="bg-white p-5 sm:p-7 lg:p-8 rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-sm">
+    <section class="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-8">
+        <div class="bg-white p-5 sm:p-7 lg:p-8 rounded-2xl border border-neutral-200 shadow-sm">
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
                 <div class="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-3.5 sm:gap-4 p-2 sm:p-0 group">
-                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-sky-50 text-sky-700 flex items-center justify-center shrink-0 border border-sky-100 group-hover:bg-sky-700 group-hover:text-white transition-all duration-300 shadow-xs">
+                    <div class="w-12 h-12 rounded-full bg-neutral-100 text-neutral-900 flex items-center justify-center shrink-0 border border-neutral-200 group-hover:bg-neutral-900 group-hover:text-white transition-all duration-300">
                         <svg class="w-7 h-7 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M8 17a2 2 0 100 4 2 2 0 000-4zm10 0a2 2 0 100 4 2 2 0 000-4zM5 12h14l1 3H4l1-3z"/></svg>
                     </div>
                     <div class="min-w-0">
@@ -348,7 +351,7 @@ try {
                 </div>
 
                 <div class="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-3.5 sm:gap-4 p-2 sm:p-0 group">
-                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-indigo-50 text-indigo-700 flex items-center justify-center shrink-0 border border-indigo-100 group-hover:bg-indigo-700 group-hover:text-white transition-all duration-300 shadow-xs">
+                    <div class="w-12 h-12 rounded-full bg-neutral-100 text-neutral-900 flex items-center justify-center shrink-0 border border-neutral-200 group-hover:bg-neutral-900 group-hover:text-white transition-all duration-300">
                         <svg class="w-7 h-7 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                     </div>
                     <div class="min-w-0">
@@ -358,17 +361,17 @@ try {
                 </div>
 
                 <div class="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-3.5 sm:gap-4 p-2 sm:p-0 group">
-                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-100 group-hover:bg-amber-600 group-hover:text-white transition-all duration-300 shadow-xs">
+                    <div class="w-12 h-12 rounded-full bg-neutral-100 text-neutral-900 flex items-center justify-center shrink-0 border border-neutral-200 group-hover:bg-neutral-900 group-hover:text-white transition-all duration-300">
                         <svg class="w-7 h-7 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-3.138-3.138z"/></svg>
                     </div>
                     <div class="min-w-0">
-                        <h4 class="text-sm sm:text-base lg:text-lg font-black text-slate-900 leading-snug tracking-tight">100% Genuine Books</h4>
-                        <p class="text-xs sm:text-sm text-slate-500 font-medium mt-1">Direct publishers guarantee</p>
+                        <h4 class="text-sm sm:text-base font-bold text-neutral-900 leading-snug tracking-tight">Quality you can trust</h4>
+                        <p class="text-xs sm:text-sm text-neutral-500 font-medium mt-1">Made for lasting everyday wear</p>
                     </div>
                 </div>
 
                 <div class="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-3.5 sm:gap-4 p-2 sm:p-0 group">
-                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-100 group-hover:bg-emerald-700 group-hover:text-white transition-all duration-300 shadow-xs">
+                    <div class="w-12 h-12 rounded-full bg-neutral-100 text-neutral-900 flex items-center justify-center shrink-0 border border-neutral-200 group-hover:bg-neutral-900 group-hover:text-white transition-all duration-300">
                         <svg class="w-7 h-7 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                     </div>
                     <div class="min-w-0">
@@ -385,57 +388,48 @@ try {
     
 <!-- ==================== SPECIAL TRENDING / BESTSELLERS SECTION ==================== -->
     <?php if (!empty($trending_products)): ?>
-    <section class="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-8 my-4">
-        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-500/10 via-sky-500/5 to-white border-2 border-amber-400/40 p-5 sm:p-7 lg:p-8 shadow-sm">
+    <section class="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-8">
+        <div class="relative overflow-hidden rounded-2xl bg-neutral-950 p-5 text-white sm:p-7 lg:p-8">
             
             <!-- Background Decorative Glow -->
-            <div class="absolute -top-16 -right-16 w-56 h-56 bg-amber-400/20 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="absolute -bottom-16 -left-16 w-56 h-56 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -top-16 -right-16 w-56 h-56 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-16 -left-16 w-56 h-56 bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
 
             <!-- Header Bar -->
-            <div class="relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 border-b border-amber-200/60 pb-4">
+            <div class="relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 border-b border-white/15 pb-4">
                 <div>
                     <!-- Special Pill Badge -->
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-sm shadow-amber-500/30 mb-2">
-                        <span class="relative flex h-2 w-2">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-                        </span>
-                        <svg class="w-3.5 h-3.5 fill-current animate-pulse" viewBox="0 0 24 24">
-                            <path d="M17.556 7.847c-.503-.984-1.196-1.854-2.043-2.569-.379-.319-.895-.429-1.373-.292-.477.137-.847.493-.984.97-.246.858-.694 1.637-1.306 2.274-.755.786-1.748 1.304-2.825 1.474-.473.075-.867.388-1.047.831s-.11.954.186 1.332c.983 1.257 1.558 2.809 1.633 4.417.067 1.442-.423 2.859-1.378 3.985-.308.363-.377.871-.177 1.3.199.429.626.706 1.104.717 3.327.08 6.444-1.464 8.358-4.131 1.913-2.668 2.247-6.13.892-9.108zm-5.556 12.153c-.366 0-.726-.046-1.077-.134.629-.974.912-2.13.805-3.308-.077-1.173-.497-2.3-1.213-3.256.467-.282.969-.504 1.498-.662.593.893 1.393 1.625 2.33 2.131-.476 2.92-2.124 4.965-2.343 5.229z"/>
-                        </svg>
-                        <span class="text-[11px] font-black uppercase tracking-wider">Top 6 Bestsellers</span>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white border border-white/15 mb-2">
+                        <span class="h-1.5 w-1.5 rounded-full bg-white"></span>
+                        <span class="text-[10px] font-bold uppercase tracking-[0.16em]">Bestsellers</span>
                     </div>
 
-                    <h2 class="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-                        Trending Books
-                        <span class="text-xs font-bold text-amber-600 bg-amber-100 border border-amber-200 px-2 py-0.5 rounded-lg">Verified Orders</span>
+                    <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold text-white tracking-tight flex items-center gap-2">
+                        Most wanted
+                        <span class="text-xs font-semibold text-white/70 bg-white/10 border border-white/15 px-2 py-0.5 rounded-full">Customer favourites</span>
                     </h2>
-                    <p class="text-slate-500 text-xs sm:text-sm mt-0.5 font-medium">Sri Lanka's most demanded books calculated directly from customer orders</p>
+                    <p class="text-white/65 text-xs sm:text-sm mt-1">The styles customers are choosing this season.</p>
                 </div>
 
-                <a href="/shop?sort=price_high" class="inline-flex items-center gap-1.5 text-xs font-bold text-sky-800 bg-white hover:bg-sky-50 border border-slate-200 px-4 py-2 rounded-xl transition shadow-xs group self-start sm:self-auto shrink-0">
-                    <span>Explore All Titles</span>
+                <a href="/shop" class="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-950 bg-white hover:bg-neutral-200 border border-white px-4 py-2 rounded-full transition group self-start sm:self-auto shrink-0">
+                    <span>Shop bestsellers</span>
                     <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
                 </a>
             </div>
 
             <!-- Products Grid with Rank Badges -->
-            <div class="relative z-10 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-3.5 sm:gap-4">
+            <div class="relative z-10 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3.5 sm:gap-4">
                 <?php 
                 $rank = 1;
                 foreach ($trending_products as $p): 
-                    // Rank Badge Colors: #1 Gold, #2 Silver, #3 Bronze, others Dark Slate
                     $rankClass = match($rank) {
-                        1 => 'bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 shadow-amber-500/40',
-                        2 => 'bg-gradient-to-r from-slate-300 to-slate-400 text-slate-900 shadow-slate-400/40',
-                        3 => 'bg-gradient-to-r from-amber-700 to-amber-600 text-white shadow-amber-700/40',
-                        default => 'bg-slate-900 text-white shadow-slate-900/30'
+                        1 => 'bg-white text-neutral-950',
+                        default => 'bg-neutral-900 text-white border border-white/20'
                     };
                 ?>
                     <div class="relative group/rank h-full flex flex-col">
                         <!-- Floating Trend Rank Tag -->
-                        <div class="absolute -top-2.5 -left-2 z-30 flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider shadow-md <?= $rankClass; ?>">
+                        <div class="absolute -top-2.5 -left-2 z-30 flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-md <?= $rankClass; ?>">
                             <span>#<?= $rank; ?></span>
                             <?php if ($rank === 1): ?>
                                 <span>★</span>
@@ -459,24 +453,24 @@ try {
 
     <!-- ==================== 3. EXPLORE CATEGORIES ==================== -->
     <section class="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-8">
-        <div class="flex justify-between items-end mb-6 border-b border-slate-200 pb-3.5">
+        <div class="flex justify-between items-end mb-6 border-b border-neutral-200 pb-4">
             <div>
-                <span class="text-[10px] font-bold text-sky-700 uppercase tracking-widest">Discover Genres</span>
-                <h2 class="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 tracking-tight mt-0.5">Explore Categories</h2>
-                <p class="text-slate-500 text-xs sm:text-sm mt-0.5 font-medium">Browse our wide range of reading genres</p>
+                <span class="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.2em]">Find your fit</span>
+                <h2 class="text-2xl sm:text-3xl font-bold text-neutral-950 tracking-tight mt-1">Shop by category</h2>
+                <p class="text-neutral-500 text-sm mt-1">Build your wardrobe with everyday essentials.</p>
             </div>
-            <a href="/shop" class="text-xs sm:text-sm font-bold text-sky-700 hover:text-sky-800 uppercase tracking-wider flex items-center gap-1 group">
-                <span>View All Categories</span>
+            <a href="/shop" class="text-xs sm:text-sm font-bold text-neutral-900 hover:text-neutral-500 uppercase tracking-wider flex items-center gap-1 group">
+                <span>Shop all</span>
                 <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
             </a>
         </div>
 
-        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-6 gap-3.5 sm:gap-4">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5 sm:gap-4">
             <?php if (!empty($featured_categories)): ?>
                 <?php foreach (array_slice($featured_categories, 0, 12) as $cat): 
                     $cat_slug = htmlspecialchars($cat['slug'] ?? 'all');
                     $cat_name = htmlspecialchars($cat['name'] ?? 'Category');
-                    $book_count = (int)($cat['book_count'] ?? 0);
+                    $product_count = (int)($cat['product_count'] ?? 0);
 
                     $cat_img = null;
                     if (!empty($cat['image'])) {
@@ -485,24 +479,24 @@ try {
                             : '/' . ltrim(htmlspecialchars($cat['image']), '/');
                     }
                 ?>
-                    <a href="/shop?categories[]=<?= $cat_slug ?>" class="group bg-white rounded-2xl border border-slate-200/90 hover:border-sky-700 hover:shadow-xl hover:shadow-sky-700/10 transition-all duration-300 flex flex-col overflow-hidden text-center">
-                        <div class="relative w-full aspect-square bg-slate-100 overflow-hidden border-b border-slate-100 rounded-t-2xl">
+                    <a href="/shop?categories[]=<?= $cat_slug ?>" class="group relative aspect-[4/5] overflow-hidden rounded-xl bg-neutral-200 text-left">
+                        <div class="absolute inset-0">
                             <?php if ($cat_img): ?>
-                                <img src="<?= $cat_img; ?>" alt="<?= $cat_name; ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" loading="lazy">
+                                <img src="<?= $cat_img; ?>" alt="<?= $cat_name; ?>" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy">
                             <?php else: ?>
-                                <div class="w-full h-full flex items-center justify-center bg-slate-50 text-sky-700/80">
-                                    <svg class="w-10 h-10 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                                <div class="w-full h-full flex items-center justify-center bg-neutral-100 text-neutral-500">
+                                    <svg class="w-10 h-10 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 3l5 4-3 4-3-2v12H9V9L6 11 3 7l5-4 2 2h4l2-2z"/></svg>
                                 </div>
                             <?php endif; ?>
                         </div>
-
-                        <div class="p-3.5 sm:p-4 flex flex-col items-center flex-1 justify-between bg-white rounded-b-2xl">
-                            <h3 class="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-sky-700 transition-colors truncate max-w-full leading-snug">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/5 to-transparent"></div>
+                        <div class="absolute inset-x-0 bottom-0 p-4 text-white sm:p-5">
+                            <h3 class="text-base font-bold leading-tight sm:text-lg">
                                 <?= $cat_name; ?>
                             </h3>
                             <div class="mt-2">
-                                <span class="inline-flex items-center text-[10px] font-bold bg-sky-50 text-sky-800 px-2.5 py-0.5 rounded-md border border-sky-100/80">
-                                    <?= number_format($book_count); ?> <?= $book_count === 1 ? 'Book' : 'Books'; ?>
+                                <span class="inline-flex items-center text-[10px] font-semibold text-white/85">
+                                    <?= number_format($product_count); ?> <?= $product_count === 1 ? 'style' : 'styles'; ?>
                                 </span>
                             </div>
                         </div>
@@ -517,31 +511,31 @@ try {
     </section>
 
     <!-- ==================== 4. MAIN STORE SHOWCASE ==================== -->
-    <section class="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-8">
-        <div class="flex justify-between items-end mb-5 border-b border-slate-200 pb-3">
+    <section class="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-10">
+        <div class="flex justify-between items-end mb-6 border-b border-neutral-200 pb-4">
             <div>
-                <span class="text-[10px] font-bold text-sky-700 uppercase tracking-widest">Store Showcase</span>
-                <h2 class="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-wider mt-0.5">Latest Books & Bestsellers</h2>
+                <span class="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.2em]">Just landed</span>
+                <h2 class="text-2xl sm:text-3xl font-bold text-neutral-950 tracking-tight mt-1">New arrivals</h2>
             </div>
-            <a href="/shop" class="text-xs font-bold text-sky-700 hover:text-sky-800 uppercase tracking-wider">
-                Explore All Books (<?= count($featured_products); ?>) &rarr;
+            <a href="/shop" class="text-xs font-bold text-neutral-900 hover:text-neutral-500 uppercase tracking-wider">
+                Shop all (<?= count($featured_products); ?>) &rarr;
             </a>
         </div>
 
         <?php if (!empty($featured_products)): ?>
-            <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-6 gap-3 sm:gap-4">
+            <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-5">
                 <?php foreach ($featured_products as $p): ?>
                     <?php include __DIR__ . '/products/cards/product_card_1.php'; ?>
                 <?php endforeach; ?>
             </div>
         <?php else: ?>
-            <div class="text-center py-16 bg-white rounded-2xl border border-slate-200 text-slate-400 text-xs">
+            <div class="text-center py-16 bg-white rounded-2xl border border-neutral-200 text-neutral-400 text-sm">
                 No products found in the catalog.
             </div>
         <?php endif; ?>
     </section>
 
-    <!-- ==================== 5. CATEGORY-WISE BOOK SECTIONS ==================== -->
+    <!-- ==================== 5. CATEGORY COLLECTIONS ==================== -->
     <?php if (!empty($category_books)): ?>
         <?php foreach ($category_books as $cData): 
             $cat = $cData['category'];
@@ -549,18 +543,18 @@ try {
             $cat_slug = htmlspecialchars($cat['slug']);
             $cat_name = htmlspecialchars($cat['name']);
         ?>
-            <section class="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-6">
-                <div class="flex justify-between items-end mb-4 border-b border-slate-200 pb-3">
+            <section class="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-8">
+                <div class="flex justify-between items-end mb-5 border-b border-neutral-200 pb-4">
                     <div>
-                        <span class="text-[10px] font-bold text-sky-700 uppercase tracking-widest">Genre Highlights</span>
-                        <h2 class="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-wider mt-0.5"><?= $cat_name; ?></h2>
+                        <span class="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.2em]">Explore the edit</span>
+                        <h2 class="text-2xl sm:text-3xl font-bold text-neutral-950 tracking-tight mt-1"><?= $cat_name; ?></h2>
                     </div>
-                    <a href="/shop?categories[]=<?= $cat_slug; ?>" class="text-xs font-bold text-sky-700 hover:text-sky-800 uppercase tracking-wider">
+                    <a href="/shop?categories[]=<?= $cat_slug; ?>" class="text-xs font-bold text-neutral-900 hover:text-neutral-500 uppercase tracking-wider">
                         View All <?= $cat_name; ?> &rarr;
                     </a>
                 </div>
 
-                <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-6 gap-3 sm:gap-4">
+                <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-5">
                     <?php foreach ($books as $p): ?>
                         <?php include __DIR__ . '/products/cards/product_card_1.php'; ?>
                     <?php endforeach; ?>
@@ -569,16 +563,16 @@ try {
         <?php endforeach; ?>
     <?php endif; ?>
 
-<!-- ==================== 6. TOP PUBLISHERS SECTION ==================== -->
-    <section class="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-8">
-        <div class="flex justify-between items-end mb-5 border-b border-slate-200 pb-3.5">
+<!-- ==================== 6. FEATURED BRANDS ==================== -->
+    <section class="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-10">
+        <div class="flex justify-between items-end mb-6 border-b border-neutral-200 pb-4">
             <div>
-                <span class="text-[10px] font-bold text-sky-700 uppercase tracking-widest">Authorized Imprints</span>
-                <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-0.5">Top Publishers</h2>
-                <p class="text-slate-500 text-xs mt-0.5 font-medium">Browse authentic books from Sri Lanka's leading publication houses</p>
+                <span class="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.2em]">Labels we love</span>
+                <h2 class="text-2xl sm:text-3xl font-bold text-neutral-950 tracking-tight mt-1">Featured brands</h2>
+                <p class="text-neutral-500 text-sm mt-1">Discover the labels behind your everyday essentials.</p>
             </div>
-            <a href="/publishers" class="text-xs font-bold text-sky-700 hover:text-sky-800 uppercase tracking-wider flex items-center gap-1 group">
-                <span>View All Publishers</span>
+            <a href="/shop" class="text-xs font-bold text-neutral-900 hover:text-neutral-500 uppercase tracking-wider flex items-center gap-1 group">
+                <span>Shop all brands</span>
                 <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
             </a>
         </div>
@@ -587,37 +581,18 @@ try {
             <?php if (!empty($featured_publishers)): ?>
                 <?php foreach ($featured_publishers as $pub): 
                     $pub_id = (int)$pub['id'];
-                    $pub_name = htmlspecialchars($pub['name'] ?? 'Publisher');
-                    $book_count = (int)($pub['book_count'] ?? 0);
-                    
-                    $pub_img = null;
-                    if (!empty($pub['image'])) {
-                        $pub_img = (str_starts_with($pub['image'], 'http://') || str_starts_with($pub['image'], 'https://'))
-                            ? $pub['image']
-                            : '/' . ltrim(htmlspecialchars($pub['image']), '/');
-                    }
+                    $pub_name = htmlspecialchars($pub['name'] ?? 'Brand');
+                    $product_count = (int)($pub['product_count'] ?? 0);
                 ?>
-                    <a href="/shop?brands[]=<?= $pub_id ?>" class="group bg-white rounded-2xl border border-slate-200/90 hover:border-sky-700 hover:shadow-xl hover:shadow-sky-700/10 transition-all duration-300 flex flex-col justify-center items-center text-center p-4 sm:p-5">
-                        
-                        <?php /* ==================== IMAGE CONTAINER (COMMENTED OUT) ====================
-                        <div class="relative w-full aspect-square bg-slate-100 overflow-hidden border-b border-slate-100 rounded-t-2xl mb-3">
-                            if ($pub_img) {
-                                echo '<img src="' . $pub_img . '" alt="' . $pub_name . '" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" loading="lazy">';
-                            } else {
-                                echo '<div class="w-full h-full flex items-center justify-center bg-slate-50 text-sky-700/80">
-                                    <svg class="w-10 h-10 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                                </div>';
-                            }
-                        </div>
-                        ============================================================================= */ ?>
+                    <a href="/shop?brands[]=<?= $pub_id ?>" class="group bg-white rounded-xl border border-neutral-200 hover:border-neutral-900 hover:shadow-lg transition-all duration-300 flex flex-col justify-center items-center text-center p-5 sm:p-7">
 
                         <div class="flex flex-col items-center justify-center w-full">
-                            <h3 class="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-sky-700 transition-colors truncate max-w-full leading-snug">
+                            <h3 class="text-sm font-bold text-neutral-900 group-hover:text-neutral-500 transition-colors truncate max-w-full leading-snug">
                                 <?= $pub_name; ?>
                             </h3>
                             <div class="mt-2">
-                                <span class="inline-flex items-center text-[10px] font-bold bg-sky-50 text-sky-800 px-2.5 py-0.5 rounded-md border border-sky-100/80">
-                                    <?= number_format($book_count); ?> <?= $book_count === 1 ? 'Title' : 'Titles'; ?>
+                                <span class="inline-flex items-center text-[10px] font-semibold text-neutral-500 px-2.5 py-0.5 rounded-full bg-neutral-100">
+                                    <?= number_format($product_count); ?> <?= $product_count === 1 ? 'item' : 'items'; ?>
                                 </span>
                             </div>
                         </div>
@@ -625,72 +600,22 @@ try {
                 <?php endforeach; ?>
             <?php else: ?>
                 <div class="col-span-full text-center py-10 bg-white rounded-2xl border border-slate-200 text-slate-400 text-xs">
-                    No publishers found in the catalog.
+                    No brands found in the catalog.
                 </div>
             <?php endif; ?>
         </div>
     </section>
 
-    <!-- ==================== 7. FEATURED AUTHORS SECTION ==================== -->
-    <section class="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-8">
-        <div class="flex justify-between items-end mb-5 border-b border-slate-200 pb-3.5">
-            <div>
-                <span class="text-[10px] font-bold text-sky-700 uppercase tracking-widest">Literary Creators</span>
-                <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-0.5">Featured Authors</h2>
-                <p class="text-slate-500 text-xs mt-0.5 font-medium">Explore literature and celebrated works by your favorite authors</p>
-            </div>
-            <a href="/authors" class="text-xs font-bold text-sky-700 hover:text-sky-800 uppercase tracking-wider flex items-center gap-1 group">
-                <span>View All Authors</span>
-                <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-            </a>
-        </div>
-
-        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-6 gap-3.5 sm:gap-4">
-            <?php if (!empty($featured_authors)): ?>
-                <?php foreach ($featured_authors as $author): 
-                    $author_name = htmlspecialchars($author['name'] ?? 'Author');
-                    $author_slug = htmlspecialchars($author['slug'] ?? '');
-                    $book_count = (int)($author['book_count'] ?? 0);
-                    $first_letter = strtoupper(mb_substr(trim($author['name']), 0, 1));
-                ?>
-                    <a href="/shop?authors[]=<?= urlencode($author['name']); ?>" class="group bg-white p-5 rounded-2xl border border-slate-200/90 hover:border-sky-700 hover:shadow-xl hover:shadow-sky-700/10 transition-all duration-300 flex flex-col items-center text-center">
-                        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-tr from-sky-100 via-sky-50 to-white text-sky-700 flex items-center justify-center border-2 border-sky-200 group-hover:border-sky-700 group-hover:scale-105 transition-all duration-300 shadow-xs mb-3.5 relative overflow-hidden">
-                            <span class="text-lg sm:text-xl font-black uppercase text-sky-800 select-none">
-                                <?= $first_letter ?: 'A'; ?>
-                            </span>
-                            <div class="absolute bottom-0 right-0 w-5 h-5 bg-sky-700 text-white rounded-full flex items-center justify-center shadow-xs">
-                                <svg class="w-3 h-3 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"/></svg>
-                            </div>
-                        </div>
-
-                        <h3 class="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-sky-700 transition-colors truncate max-w-full leading-snug">
-                            <?= $author_name; ?>
-                        </h3>
-
-                        <div class="mt-1.5">
-                            <span class="inline-flex items-center text-[10px] font-bold bg-sky-50 text-sky-800 px-2.5 py-0.5 rounded-md border border-sky-100/80">
-                                <?= number_format($book_count); ?> <?= $book_count === 1 ? 'Book' : 'Books'; ?>
-                            </span>
-                        </div>
-                    </a>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <div class="col-span-full text-center py-10 bg-white rounded-2xl border border-slate-200 text-slate-400 text-xs">
-                    No authors found in the catalog.
-                </div>
-            <?php endif; ?>
-        </div>
-    </section>
-
-    <!-- ==================== 8. LATEST BLOG POSTS ==================== -->
+    <!-- ==================== 7. STYLE JOURNAL ==================== -->
     <section class="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-10 pb-16">
-        <div class="flex justify-between items-end mb-4 border-b border-slate-200 pb-3">
+        <div class="flex justify-between items-end mb-5 border-b border-neutral-200 pb-4">
             <div>
-                <h2 class="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-wider">Literary Articles</h2>
-                <p class="text-slate-500 text-xs mt-0.5">Reviews, reading guides, and literary discussions</p>
+                <span class="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.2em]">The 4MEN edit</span>
+                <h2 class="text-2xl sm:text-3xl font-bold text-neutral-950 tracking-tight mt-1">Style journal</h2>
+                <p class="text-neutral-500 text-sm mt-1">Ideas, inspiration and notes on dressing well.</p>
             </div>
-            <a href="/blog" class="text-xs font-bold text-sky-700 hover:text-sky-800 uppercase tracking-wider">
-                All Articles &rarr;
+            <a href="/blog" class="text-xs font-bold text-neutral-900 hover:text-neutral-500 uppercase tracking-wider">
+                Read the journal &rarr;
             </a>
         </div>
 
@@ -704,48 +629,3 @@ try {
     </section>
 
 </div>
-
-<!-- Swiper Initialization -->
-<script>
-    (function initSwiperSlider() {
-        let swiperInstance = null;
-        let attempts = 0;
-
-        function runSwiper() {
-            if (swiperInstance) return;
-            if (typeof Swiper !== 'undefined') {
-                swiperInstance = new Swiper('.hero-swiper', {
-                    slidesPerView: 1,
-                    spaceBetween: 0,
-                    loop: true,
-                    speed: 700,
-                    effect: 'fade',
-                    fadeEffect: { crossFade: true },
-                    autoplay: {
-                        delay: 4500,
-                        disableOnInteraction: false,
-                        pauseOnMouseEnter: true
-                    },
-                    pagination: {
-                        el: '.swiper-pagination',
-                        clickable: true,
-                    },
-                    navigation: {
-                        nextEl: '.swiper-button-next',
-                        prevEl: '.swiper-button-prev',
-                    },
-                });
-            } else if (attempts < 25) {
-                attempts++;
-                setTimeout(runSwiper, 150);
-            }
-        }
-
-        if (document.readyState === 'loading') {
-            document.addEventListener("DOMContentLoaded", runSwiper);
-        } else {
-            runSwiper();
-        }
-        window.addEventListener('load', runSwiper);
-    })();
-</script>
